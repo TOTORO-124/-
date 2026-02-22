@@ -511,17 +511,29 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
   }, [profile]);
 
   const handleLogin = async () => {
-    const res = await fetch('/api/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password })
-    });
-    const data = await res.json();
-    if (data.success) {
-      setIsLoggedIn(true);
-      setToken(data.token);
-    } else {
-      alert('비밀번호가 틀렸습니다.');
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.message || '로그인에 실패했습니다.');
+        return;
+      }
+
+      const data = await res.json();
+      if (data.success) {
+        setIsLoggedIn(true);
+        setToken(data.token);
+      } else {
+        alert('비밀번호가 틀렸습니다.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('서버와 통신 중 오류가 발생했습니다.');
     }
   };
 
