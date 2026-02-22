@@ -519,8 +519,14 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
       });
       
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        alert(errorData.message || '로그인에 실패했습니다.');
+        let errorMessage = '로그인에 실패했습니다.';
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          errorMessage = `서버 오류 (${res.status})`;
+        }
+        alert(errorMessage);
         return;
       }
 
@@ -533,7 +539,7 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('서버와 통신 중 오류가 발생했습니다.');
+      alert('서버와 통신 중 오류가 발생했습니다. 인터넷 연결이나 서버 상태를 확인해주세요.');
     }
   };
 
