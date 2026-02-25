@@ -19,9 +19,53 @@ import {
   Edit2,
   Save,
   LogOut,
-  Upload
+  Upload,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { Project, Experience, Profile } from './types';
+import { supabase } from './lib/supabase';
+
+// --- Constants ---
+
+const DEFAULT_PROFILE: Partial<Profile> = {
+  site_name: 'TEDIO',
+  hero_label: 'Video Editor & Motion Designer',
+  hero_title: '브랜드 톤은 지키고,',
+  hero_subtitle: '메시지는 더 또렷하게.',
+  hero_description: '기업·교육·인터뷰 중심의 영상 편집/모션 작업을 합니다.\n목적에 맞는 구조, 자막 가독성, 리듬감 있는 편집에 강합니다.',
+  about_strengths_title: 'About & Strengths',
+  about_subtitle: '영상의 목적과 톤을 먼저 이해하고, \n구조와 리듬으로 전달력을 높이는 편집을 지향합니다.',
+  about_text: '기업/교육/인터뷰 기반 작업을 중심으로, 깔끔하고 안정적인 결과물을 만듭니다. \n단순한 컷 편집을 넘어 시청자가 끝까지 몰입할 수 있는 흐름을 설계합니다.',
+  strength1_title: '구조 설계',
+  strength1_desc: '흐름이 자연스럽고 이해가 쉬운 편집',
+  strength2_title: '자막 가독성',
+  strength2_desc: '화면을 해치지 않는 자막 배치와 리듬',
+  strength3_title: '마감 퀄리티',
+  strength3_desc: '사운드 정리, 템포, 전체 톤 통일',
+  featured_title: 'Featured Projects',
+  featured_subtitle: '대표작 3선',
+  work_title: 'Work Archive',
+  work_subtitle: '전체 작업 모음',
+  contact_title: 'Contact',
+  contact_subtitle: "Let's collaborate.",
+  contact_email: 'gns8365@naver.com',
+  contact_kakao: 'https://open.kakao.com/o/sribRuxh',
+  exp_title: 'Experience Snapshot',
+  exp_label_field: '주 작업 분야',
+  exp_label_scope: '협업 범위',
+  exp_label_strengths: '강점',
+  exp_label_brands: '협력 브랜드'
+};
+
+const DEFAULT_EXPERIENCE: Partial<Experience> = {
+  role: 'Freelance Video Editor',
+  period: '2021 - Present',
+  field: '기업 홍보, 교육 콘텐츠, 인터뷰',
+  scope: '컷 편집, 모션 그래픽, 자막 디자인, 색보정',
+  strengths: '스토리텔링 중심의 편집, 가독성 높은 자막 리듬',
+  brands: '기업 홍보 영상, 유튜브 채널, 온라인 강의 플랫폼 등 다수'
+};
 
 // --- Components ---
 
@@ -51,10 +95,10 @@ const VideoModal = ({ isOpen, videoUrl, onClose }: { isOpen: boolean, videoUrl: 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 md:p-12"
+      className="fixed inset-0 z-[100] bg-cocoa/95 flex items-center justify-center p-4 md:p-12"
       onClick={onClose}
     >
-      <button className="absolute top-8 right-8 text-white/80 hover:text-white transition-colors">
+      <button className="absolute top-8 right-8 text-sky hover:text-sky-hover transition-colors">
         <X size={32} />
       </button>
       <motion.div 
@@ -93,28 +137,28 @@ const Navbar = ({ profile, onAdminClick }: { profile: Profile | null, onAdminCli
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'glass py-4' : 'bg-transparent py-6'}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'glass py-4 shadow-lg' : 'bg-white/80 backdrop-blur-md py-6'}`}>
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        <a href="#" className="text-2xl font-bold tracking-tighter font-serif italic text-black">{profile?.site_name || 'TEDIO'}</a>
+        <a href="#" className="text-2xl font-bold tracking-tighter font-serif italic text-cocoa">{profile?.site_name || 'TEDIO'}</a>
         
         <div className="hidden md:flex items-center gap-8">
           {menuItems.map((item) => (
-            <a key={item.name} href={item.href} className="text-sm font-medium text-black/80 hover:text-black transition-colors">
+            <a key={item.name} href={item.href} className="text-sm font-medium text-cocoa/80 hover:text-sky-hover transition-colors">
               {item.name}
             </a>
           ))}
           <button 
             onClick={() => window.location.href = '#contact'}
-            className="px-5 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-black/80 transition-colors"
+            className="px-5 py-2 rounded-full bg-cocoa text-white text-sm font-semibold hover:bg-sky-hover transition-colors"
           >
             협업/채용 문의
           </button>
-          <button onClick={onAdminClick} className="p-2 text-black/60 hover:text-black transition-colors">
+          <button onClick={onAdminClick} className="p-2 text-cocoa/60 hover:text-sky-hover transition-colors">
             <Settings size={18} />
           </button>
         </div>
 
-        <button className="md:hidden text-black" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+        <button className="md:hidden text-cocoa" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
           {isMobileMenuOpen ? <X /> : <Menu />}
         </button>
       </div>
@@ -137,15 +181,26 @@ const Navbar = ({ profile, onAdminClick }: { profile: Profile | null, onAdminCli
                 {item.name}
               </a>
             ))}
-            <button 
-              onClick={() => {
-                window.location.href = '#contact';
-                setIsMobileMenuOpen(false);
-              }}
-              className="w-full py-3 rounded-xl bg-white text-black font-semibold"
-            >
-              협업/채용 문의
-            </button>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => {
+                  window.location.href = '#contact';
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex-1 py-3 rounded-xl bg-cocoa text-white font-semibold"
+              >
+                협업/채용 문의
+              </button>
+              <button 
+                onClick={() => {
+                  onAdminClick();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="p-3 rounded-xl bg-sky/20 text-cocoa"
+              >
+                <Settings size={20} />
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -157,7 +212,7 @@ const Hero = ({ mainProject, profile, onProjectClick }: { mainProject: Project |
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
       {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-black/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-sky/5 rounded-full blur-[120px] pointer-events-none" />
       
       <div className="max-w-7xl mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
         <motion.div
@@ -165,21 +220,21 @@ const Hero = ({ mainProject, profile, onProjectClick }: { mainProject: Project |
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <span className="inline-block px-3 py-1 rounded-full border border-black/20 text-xs font-bold text-black/80 mb-6">
-            Video Editor & Motion Designer
+          <span className="inline-block px-3 py-1 rounded-full border border-sky-hover/30 bg-sky/10 text-xs font-bold text-cocoa mb-6">
+            {profile?.hero_label || 'Video Editor & Motion Designer'}
           </span>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.1] text-black">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.1] text-cocoa">
             {profile?.hero_title || '브랜드 톤은 지키고,'}<br />
-            <span className="text-black/60">{profile?.hero_subtitle || '메시지는 더 또렷하게.'}</span>
+            <span className="text-sky-hover">{profile?.hero_subtitle || '메시지는 더 또렷하게.'}</span>
           </h1>
-          <p className="text-lg md:text-xl text-black/90 mb-10 max-w-xl leading-relaxed whitespace-pre-line">
+          <p className="text-lg md:text-xl text-ink/80 mb-10 max-w-xl leading-relaxed whitespace-pre-line">
             {profile?.hero_description || '기업·교육·인터뷰 중심의 영상 편집/모션 작업을 합니다.\n목적에 맞는 구조, 자막 가독성, 리듬감 있는 편집에 강합니다.'}
           </p>
           <div className="flex flex-wrap gap-4">
-            <a href="#featured" className="px-8 py-4 rounded-full bg-black text-white font-bold flex items-center gap-2 hover:scale-105 transition-transform">
+            <a href="#featured" className="px-8 py-4 rounded-full bg-cocoa text-white font-bold flex items-center gap-2 hover:bg-sky-hover transition-all hover:scale-105">
               대표작 보기 <ChevronRight size={18} />
             </a>
-            <a href="#contact" className="px-8 py-4 rounded-full border border-black/20 text-black font-bold hover:bg-black/5 transition-colors">
+            <a href="#contact" className="px-8 py-4 rounded-full border border-border text-cocoa font-bold hover:bg-sky/5 transition-colors">
               협업/채용 문의
             </a>
           </div>
@@ -190,16 +245,16 @@ const Hero = ({ mainProject, profile, onProjectClick }: { mainProject: Project |
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.2 }}
           onClick={() => mainProject && onProjectClick(mainProject)}
-          className="relative aspect-video rounded-2xl overflow-hidden border border-black/5 shadow-2xl group cursor-pointer"
+          className="relative aspect-video rounded-2xl overflow-hidden border border-cocoa/5 shadow-2xl group cursor-pointer"
         >
           <img 
             src={mainProject?.thumbnail || "https://picsum.photos/seed/showreel/1280/720"} 
             alt="Showreel Thumbnail" 
             className="w-full h-full object-cover grayscale blur-[2px] group-hover:grayscale-0 group-hover:blur-0 transition-all duration-700"
           />
-          <div className="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/10 transition-colors">
+          <div className="absolute inset-0 bg-cocoa/20 flex items-center justify-center group-hover:bg-cocoa/10 transition-colors">
             <div className="w-20 h-20 rounded-full glass flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Play fill="white" size={32} className="text-white" />
+              <Play fill="#5D9CEC" size={32} className="text-sky" />
             </div>
           </div>
           <div className="absolute bottom-6 left-6 text-white">
@@ -216,17 +271,17 @@ const Hero = ({ mainProject, profile, onProjectClick }: { mainProject: Project |
 
 const FeaturedSection = ({ projects, profile, onProjectClick }: { projects: Project[], profile: Profile | null, onProjectClick: (p: Project) => void }) => {
   return (
-    <section id="featured" className="py-32 bg-black/5">
+    <section id="featured" className="py-32 bg-cocoa/5">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-end justify-between mb-16">
           <div>
-            <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-black/70 mb-4">{profile?.featured_title || 'Featured Projects'}</h2>
-            <p className="text-4xl font-serif italic text-black">{profile?.featured_subtitle || '대표작 3선'}</p>
+            <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-cocoa/70 mb-4">{profile?.featured_title || 'Featured Projects'}</h2>
+            <p className="text-4xl font-serif italic text-cocoa">{profile?.featured_subtitle || '대표작 3선'}</p>
           </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {projects.map((project, idx) => (
+          {projects.length > 0 ? projects.map((project, idx) => (
             <motion.div
               key={project.id}
               initial={{ opacity: 0, y: 30 }}
@@ -236,36 +291,40 @@ const FeaturedSection = ({ projects, profile, onProjectClick }: { projects: Proj
               className="group cursor-pointer"
               onClick={() => onProjectClick(project)}
             >
-              <div className="relative aspect-[16/9] rounded-2xl overflow-hidden mb-6 border border-black/5">
+              <div className="relative aspect-[16/9] rounded-2xl overflow-hidden mb-6 border border-cocoa/5">
                 <img 
                   src={project.thumbnail || "https://picsum.photos/seed/project/800/450"} 
                   alt={project.title} 
                   className="w-full h-full object-cover blur-[2px] group-hover:blur-0 transition-all duration-700 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                <div className="absolute inset-0 bg-cocoa/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                   <div className="w-16 h-16 rounded-full glass flex items-center justify-center">
-                    <Play fill="black" size={24} />
+                    <Play fill="#7ED6C1" size={24} />
                   </div>
                 </div>
               </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-black">{project.title}</h3>
-                  <span className="text-xs font-medium px-2 py-1 rounded bg-black/10 text-black/80">{project.type}</span>
+                  <h3 className="text-xl font-bold text-cocoa">{project.title}</h3>
+                  <span className="text-xs font-medium px-2 py-1 rounded bg-sky/20 text-cocoa">{project.type}</span>
                 </div>
-                <p className="text-black/80 text-sm leading-relaxed">{project.description}</p>
+                <p className="text-ink/80 text-sm leading-relaxed">{project.description}</p>
                 {project.notes && (
-                  <div className="p-3 rounded-xl bg-black/5 border border-black/5 italic text-[13px] text-black/80">
+                  <div className="p-3 rounded-xl bg-cocoa/5 border border-cocoa/5 italic text-[13px] text-cocoa/80">
                     " {project.notes} "
                   </div>
                 )}
-                <div className="pt-2 border-t border-black/10">
-                  <p className="text-[10px] uppercase tracking-wider text-black/70 font-bold mb-1">My Role</p>
-                  <p className="text-xs text-black font-medium">{project.role}</p>
+                <div className="pt-2 border-t border-cocoa/10">
+                  <p className="text-[10px] uppercase tracking-wider text-cocoa/70 font-bold mb-1">My Role</p>
+                  <p className="text-xs text-cocoa font-medium">{project.role}</p>
                 </div>
               </div>
             </motion.div>
-          ))}
+          )) : (
+            <div className="col-span-full py-20 text-center glass rounded-3xl">
+              <p className="text-cocoa/40 font-serif italic text-xl">표시할 대표작이 없습니다.</p>
+            </div>
+          )}
         </div>
       </div>
     </section>
@@ -275,7 +334,14 @@ const FeaturedSection = ({ projects, profile, onProjectClick }: { projects: Proj
 const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], profile: Profile | null, onProjectClick: (p: Project) => void }) => {
   const [filter, setFilter] = useState('All');
   const scrollRef = useRef<HTMLDivElement>(null);
-  const categories = ['All', 'Corporate', 'Education', 'Interview', 'Sketch/Event', 'Shorts'];
+  const categories = [
+    {v: 'All', l: '전체'},
+    {v: 'Corporate', l: '기업 영상'},
+    {v: 'Education', l: '교육/강의'},
+    {v: 'Interview', l: '인터뷰'},
+    {v: 'Sketch/Event', l: '스케치/행사'},
+    {v: 'Shorts', l: '숏폼/SNS'}
+  ];
 
   const filteredProjects = filter === 'All' 
     ? projects 
@@ -296,19 +362,19 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
           <div>
-            <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-black/80 mb-4">{profile?.work_title || 'Work Archive'}</h2>
-            <p className="text-4xl font-serif italic text-black">{profile?.work_subtitle || '전체 작업 모음'}</p>
+            <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-cocoa/80 mb-4">{profile?.work_title || 'Work Archive'}</h2>
+            <p className="text-4xl font-serif italic text-cocoa">{profile?.work_subtitle || '전체 작업 모음'}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {categories.map(cat => (
               <button
-                key={cat}
-                onClick={() => setFilter(cat)}
+                key={cat.v}
+                onClick={() => setFilter(cat.v)}
                 className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                  filter === cat ? 'bg-black text-white' : 'border border-black/30 text-black hover:border-black/50'
+                  filter === cat.v ? 'bg-cocoa text-white' : 'border border-cocoa/30 text-cocoa hover:border-cocoa/50'
                 }`}
               >
-                {cat}
+                {cat.l}
               </button>
             ))}
           </div>
@@ -318,15 +384,15 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
           {/* Navigation Buttons */}
           <button 
             onClick={() => scroll('left')}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full glass flex items-center justify-center opacity-0 group-hover/scroll:opacity-100 transition-opacity hover:bg-black/10"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full glass flex items-center justify-center opacity-0 group-hover/scroll:opacity-100 transition-opacity hover:bg-cocoa/10"
           >
-            <ChevronLeft size={24} className="text-black" />
+            <ChevronLeft size={24} className="text-cocoa" />
           </button>
           <button 
             onClick={() => scroll('right')}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full glass flex items-center justify-center opacity-0 group-hover/scroll:opacity-100 transition-opacity hover:bg-black/10"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full glass flex items-center justify-center opacity-0 group-hover/scroll:opacity-100 transition-opacity hover:bg-cocoa/10"
           >
-            <ChevronRight size={24} className="text-black" />
+            <ChevronRight size={24} className="text-cocoa" />
           </button>
 
           <div 
@@ -334,7 +400,7 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
             className="flex gap-4 overflow-x-auto pb-8 scrollbar-hide snap-x snap-mandatory"
           >
             <AnimatePresence mode="popLayout">
-              {filteredProjects.map((project) => (
+              {filteredProjects.length > 0 ? filteredProjects.map((project) => (
                 <motion.div
                   layout
                   key={project.id}
@@ -342,27 +408,31 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   onClick={() => onProjectClick(project)}
-                  className="group relative aspect-video h-[200px] md:h-[240px] shrink-0 rounded-xl overflow-hidden border border-black/10 cursor-pointer snap-start"
+                  className="group relative aspect-video h-[200px] md:h-[240px] shrink-0 rounded-xl overflow-hidden border border-cocoa/10 cursor-pointer snap-start"
                 >
                   <img 
                     src={project.thumbnail || "https://picsum.photos/seed/work/800/450"} 
                     alt={project.title} 
                     className="w-full h-full object-cover grayscale blur-[2px] group-hover:grayscale-0 group-hover:blur-0 transition-all duration-500"
                   />
-                  <div className="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end backdrop-blur-sm">
-                    <p className="text-xs font-bold text-black/80 mb-1">{project.type}</p>
-                    <h4 className="text-sm font-bold mb-2 text-black">{project.title}</h4>
-                    <p className="text-[10px] text-black/90 line-clamp-1">{project.role}</p>
+                  <div className="absolute inset-0 bg-sky/40 opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end backdrop-blur-sm">
+                    <p className="text-xs font-bold text-cocoa mb-1">{project.type}</p>
+                    <h4 className="text-sm font-bold mb-2 text-cocoa">{project.title}</h4>
+                    <p className="text-[10px] text-cocoa/90 line-clamp-1">{project.role}</p>
                   </div>
                 </motion.div>
-              ))}
+              )) : (
+                <div className="w-full py-20 text-center glass rounded-3xl flex-1 flex items-center justify-center">
+                  <p className="text-cocoa/40 font-serif italic text-xl">해당 카테고리의 영상이 없습니다.</p>
+                </div>
+              )}
             </AnimatePresence>
           </div>
           
           {/* Scroll Indicators */}
-          <div className="absolute -bottom-2 left-0 w-full h-1 bg-black/10 rounded-full overflow-hidden">
+          <div className="absolute -bottom-2 left-0 w-full h-1 bg-border rounded-full overflow-hidden">
             <motion.div 
-              className="h-full bg-black/40 rounded-full"
+              className="h-full bg-sky-hover rounded-full"
               initial={{ width: "0%" }}
               whileInView={{ width: "30%" }}
               transition={{ duration: 1 }}
@@ -376,29 +446,29 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
 
 const AboutSection = ({ experience, profile }: { experience: Experience | null, profile: Profile | null }) => {
   return (
-    <section id="about" className="py-32 bg-black/5">
+    <section id="about" className="py-32 bg-cocoa/5">
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-20 items-center">
         <div>
-          <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-black/70 mb-8">{profile?.about_strengths_title || 'About & Strengths'}</h2>
+          <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-cocoa/70 mb-8">{profile?.about_strengths_title || 'About & Strengths'}</h2>
           <div className="space-y-8">
-            <p className="text-2xl font-light leading-relaxed text-black/90 whitespace-pre-line">
+            <p className="text-2xl font-light leading-relaxed text-cocoa/90 whitespace-pre-line">
               {profile?.about_subtitle || '영상의 목적과 톤을 먼저 이해하고, \n구조와 리듬으로 전달력을 높이는 편집을 지향합니다.'}
             </p>
-            <p className="text-black/80 leading-relaxed whitespace-pre-line">
+            <p className="text-ink/80 leading-relaxed whitespace-pre-line">
               {profile?.about_text || '기업/교육/인터뷰 기반 작업을 중심으로, 깔끔하고 안정적인 결과물을 만듭니다. \n단순한 컷 편집을 넘어 시청자가 끝까지 몰입할 수 있는 흐름을 설계합니다.'}
             </p>
             
             <div className="grid grid-cols-1 gap-6 pt-8">
               {[
-                { title: '구조 설계', desc: '흐름이 자연스럽고 이해가 쉬운 편집' },
-                { title: '자막 가독성', desc: '화면을 해치지 않는 자막 배치와 리듬' },
-                { title: '마감 퀄리티', desc: '사운드 정리, 템포, 전체 톤 통일' }
+                { title: profile?.strength1_title || '구조 설계', desc: profile?.strength1_desc || '흐름이 자연스럽고 이해가 쉬운 편집' },
+                { title: profile?.strength2_title || '자막 가독성', desc: profile?.strength2_desc || '화면을 해치지 않는 자막 배치와 리듬' },
+                { title: profile?.strength3_title || '마감 퀄리티', desc: profile?.strength3_desc || '사운드 정리, 템포, 전체 톤 통일' }
               ].map((strength, i) => (
                 <div key={i} className="flex gap-4">
-                  <div className="w-1 h-full bg-black/30 rounded-full" />
+                  <div className="w-1 h-full bg-sky-hover/30 rounded-full" />
                   <div>
-                    <h4 className="font-bold mb-1 text-black">{strength.title}</h4>
-                    <p className="text-sm text-black/70">{strength.desc}</p>
+                    <h4 className="font-bold mb-1 text-cocoa">{strength.title}</h4>
+                    <p className="text-sm text-cocoa/70">{strength.desc}</p>
                   </div>
                 </div>
               ))}
@@ -407,41 +477,41 @@ const AboutSection = ({ experience, profile }: { experience: Experience | null, 
         </div>
 
         <div className="space-y-12">
-          <div id="experience" className="glass p-8 rounded-3xl border-black/10">
-            <h3 className="text-xs font-bold tracking-widest uppercase text-black/60 mb-6">{profile?.exp_title || 'Experience Snapshot'}</h3>
+          <div id="experience" className="glass p-8 rounded-3xl border-cocoa/10">
+            <h3 className="text-xs font-bold tracking-widest uppercase text-cocoa/60 mb-6">{profile?.exp_title || 'Experience Snapshot'}</h3>
             {experience ? (
               <div className="space-y-6">
                 <div>
-                  <p className="text-xl font-bold mb-1 text-black">{experience.role}</p>
-                  <p className="text-sm text-black/80">{experience.period}</p>
+                  <p className="text-xl font-bold mb-1 text-cocoa">{experience.role}</p>
+                  <p className="text-sm text-cocoa/80">{experience.period}</p>
                 </div>
                 <div className="grid gap-4">
-                  <div className="flex justify-between text-sm py-3 border-b border-black/10">
-                    <span className="text-black/80">{profile?.exp_label_field || '주 작업 분야'}</span>
-                    <span className="text-black font-medium">{experience.field}</span>
+                  <div className="flex justify-between text-sm py-3 border-b border-cocoa/10">
+                    <span className="text-cocoa/80">{profile?.exp_label_field || '주 작업 분야'}</span>
+                    <span className="text-cocoa font-medium">{experience.field}</span>
                   </div>
-                  <div className="flex justify-between text-sm py-3 border-b border-black/10">
-                    <span className="text-black/80">{profile?.exp_label_scope || '협업 범위'}</span>
-                    <span className="text-black font-medium">{experience.scope}</span>
+                  <div className="flex justify-between text-sm py-3 border-b border-cocoa/10">
+                    <span className="text-cocoa/80">{profile?.exp_label_scope || '협업 범위'}</span>
+                    <span className="text-cocoa font-medium">{experience.scope}</span>
                   </div>
-                  <div className="flex justify-between text-sm py-3 border-b border-black/10">
-                    <span className="text-black/80">{profile?.exp_label_strengths || '강점'}</span>
-                    <span className="text-black font-medium">{experience.strengths}</span>
+                  <div className="flex justify-between text-sm py-3 border-b border-cocoa/10">
+                    <span className="text-cocoa/80">{profile?.exp_label_strengths || '강점'}</span>
+                    <span className="text-cocoa font-medium">{experience.strengths}</span>
                   </div>
                   <div className="flex flex-col gap-2 py-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-black/60">{profile?.exp_label_brands || '협력 브랜드'}</span>
-                    <p className="text-sm text-black font-medium leading-relaxed">{experience.brands}</p>
+                    <span className="text-xs font-bold uppercase tracking-wider text-cocoa/60">{profile?.exp_label_brands || '협력 브랜드'}</span>
+                    <p className="text-sm text-cocoa font-medium leading-relaxed">{experience.brands}</p>
                   </div>
                 </div>
               </div>
             ) : (
-              <p className="text-black/60 italic">Loading experience data...</p>
+              <p className="text-cocoa/60 italic">Loading experience data...</p>
             )}
           </div>
 
           <div className="flex flex-wrap gap-4">
             {['Premiere Pro', 'After Effects', 'Photoshop', 'Illustrator'].map(tool => (
-              <span key={tool} className="px-4 py-2 rounded-lg bg-black/5 border border-black/20 text-xs font-medium text-black/80">
+              <span key={tool} className="px-4 py-2 rounded-lg bg-sky/10 border border-sky-hover/20 text-xs font-medium text-cocoa/80">
                 {tool}
               </span>
             ))}
@@ -454,11 +524,11 @@ const AboutSection = ({ experience, profile }: { experience: Experience | null, 
 
 const ContactSection = ({ profile }: { profile: Profile | null }) => {
   return (
-    <section id="contact" className="py-32 bg-white/30 text-black">
+    <section id="contact" className="py-32 bg-white/30 text-cocoa">
       <div className="max-w-3xl mx-auto px-6 text-center">
-        <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-black/80 mb-8">{profile?.contact_title || 'Contact'}</h2>
+        <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-cocoa/80 mb-8">{profile?.contact_title || 'Contact'}</h2>
         <h3 className="text-5xl md:text-7xl font-serif italic mb-8 tracking-tighter">{profile?.contact_subtitle || "Let's collaborate."}</h3>
-        <p className="text-lg text-black/90 mb-12 leading-relaxed">
+        <p className="text-lg text-ink/90 mb-12 leading-relaxed">
           프로젝트 협업, 외주, 채용 제안 모두 편하게 연락 주세요.<br />
           확인 후 가능한 빠르게 답변드립니다.
         </p>
@@ -466,7 +536,7 @@ const ContactSection = ({ profile }: { profile: Profile | null }) => {
         <div className="flex flex-col md:flex-row items-center justify-center gap-6">
           <a 
             href={`mailto:${profile?.contact_email || 'gns8365@naver.com'}`} 
-            className="w-full md:w-auto px-10 py-5 rounded-2xl bg-black text-white hover:bg-black/80 transition-all flex items-center justify-center gap-3 font-bold shadow-xl shadow-black/10"
+            className="w-full md:w-auto px-10 py-5 rounded-2xl bg-cocoa text-white hover:bg-sky-hover transition-all flex items-center justify-center gap-3 font-bold shadow-xl shadow-cocoa/10"
           >
             <Mail size={20} /> {profile?.contact_email || 'gns8365@naver.com'}
           </a>
@@ -474,7 +544,7 @@ const ContactSection = ({ profile }: { profile: Profile | null }) => {
             href={profile?.contact_kakao || "https://open.kakao.com/o/sribRuxh"} 
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full md:w-auto px-10 py-5 rounded-2xl bg-yellow-400 text-black hover:bg-yellow-300 transition-all flex items-center justify-center gap-3 font-bold shadow-xl shadow-yellow-400/20"
+            className="w-full md:w-auto px-10 py-5 rounded-2xl bg-[#FEE500] text-cocoa hover:bg-[#F7E600] transition-all flex items-center justify-center gap-3 font-bold shadow-xl shadow-yellow-400/20"
           >
             카카오 1:1 문의
           </a>
@@ -497,6 +567,7 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
   const [password, setPassword] = useState('');
   const [token, setToken] = useState('');
   const [activeTab, setActiveTab] = useState<'projects' | 'experience' | 'profile'>('projects');
+  const [isSaving, setIsSaving] = useState(false);
   
   const [editingProject, setEditingProject] = useState<Partial<Project> | null>(null);
   const [editingExp, setEditingExp] = useState<Partial<Experience> | null>(experience);
@@ -511,100 +582,128 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
   }, [profile]);
 
   const handleLogin = async () => {
-    try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      });
-      
-      if (!res.ok) {
-        let errorMessage = '로그인에 실패했습니다.';
-        try {
-          const errorData = await res.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (e) {
-          errorMessage = `서버 오류 (${res.status})`;
-        }
-        alert(errorMessage);
-        return;
-      }
-
-      const data = await res.json();
-      if (data.success) {
-        setIsLoggedIn(true);
-        setToken(data.token);
-      } else {
-        alert('비밀번호가 틀렸습니다.');
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      alert('서버와 통신 중 오류가 발생했습니다. 인터넷 연결이나 서버 상태를 확인해주세요.');
+    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'admin';
+    if (password === adminPassword) {
+      setIsLoggedIn(true);
+      setToken('admin-session');
+    } else {
+      alert('비밀번호가 틀렸습니다.');
     }
   };
 
   const saveProject = async (p: Partial<Project>) => {
+    if (!supabase) {
+      alert('Supabase 설정이 필요합니다.');
+      return;
+    }
+    
+    setIsSaving(true);
     try {
-      const method = p.id ? 'PUT' : 'POST';
-      const url = p.id ? `/api/projects/${p.id}` : '/api/projects';
+      if (!p) return;
       
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...p, token })
-      });
+      const projectToSave = { ...p };
+      if (!projectToSave.id || projectToSave.id === 0) {
+        delete projectToSave.id;
+        // 새 프로젝트인 경우 마지막 순서로 지정
+        if (projectToSave.order_index === undefined) {
+          projectToSave.order_index = projects.length;
+        }
+      }
+
+      if (projectToSave.is_main) {
+        await supabase.from('projects').update({ is_main: false }).neq('id', projectToSave.id || -1);
+      }
+
+      const { error } = await supabase.from('projects').upsert(projectToSave);
       
-      if (res.ok) {
-        alert('프로젝트가 성공적으로 저장되었습니다.');
+      if (!error) {
+        alert('성공적으로 저장되었습니다.');
         setEditingProject(null);
         onUpdate();
       } else {
-        const errData = await res.text();
-        alert(`저장 실패: ${errData}`);
+        alert(`저장 실패: ${error.message}`);
       }
     } catch (error) {
-      console.error(error);
-      alert('서버 통신 중 오류가 발생했습니다.');
+      console.error('Save Error:', error);
+      alert('저장 중 오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const deleteProject = async (id: number) => {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
+  const deleteProject = async (id: any) => {
+    if (id === undefined || id === null) {
+      alert('삭제할 프로젝트의 ID를 찾을 수 없습니다.');
+      return;
+    }
+
+    if (!window.confirm('정말 이 프로젝트를 삭제하시겠습니까?')) return;
+    
+    if (!supabase) {
+      alert('Supabase 설정이 필요합니다.');
+      return;
+    }
+
+    setIsSaving(true);
     try {
-      const res = await fetch(`/api/projects/${id}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token })
-      });
-      if (res.ok) {
+      const { error } = await supabase.from('projects').delete().eq('id', Number(id));
+      
+      if (!error) {
         alert('삭제되었습니다.');
         onUpdate();
       } else {
-        alert('삭제 실패');
+        alert(`삭제 실패: ${error.message}`);
       }
     } catch (error) {
-      alert('오류 발생');
+      console.error('Delete Error:', error);
+      alert('삭제 중 오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const saveExperience = async () => {
-    await fetch('/api/experience', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...editingExp, token })
-    });
-    alert('경력이 업데이트되었습니다.');
-    onUpdate();
+    if (!supabase || !editingExp) {
+      alert('데이터가 없거나 Supabase 설정이 필요합니다.');
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const { id, ...updateData } = editingExp;
+      const { error } = await supabase.from('experience').update(updateData).eq('id', id || 1);
+      if (!error) {
+        alert('경력이 업데이트되었습니다.');
+        onUpdate();
+      } else {
+        alert(`업데이트 실패: ${error.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const saveProfile = async () => {
-    await fetch('/api/profile', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...editingProfile, token })
-    });
-    alert('프로필 정보가 업데이트되었습니다.');
-    onUpdate();
+    if (!supabase || !editingProfile) {
+      alert('데이터가 없거나 Supabase 설정이 필요합니다.');
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const { id, ...updateData } = editingProfile;
+      const { error } = await supabase.from('profile').update(updateData).eq('id', id || 1);
+      if (!error) {
+        alert('프로필이 업데이트되었습니다.');
+        onUpdate();
+      } else {
+        alert(`업데이트 실패: ${error.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const moveProject = async (index: number, direction: 'up' | 'down') => {
@@ -613,42 +712,47 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
     
     if (targetIndex < 0 || targetIndex >= newProjects.length) return;
     
-    // Swap
-    [newProjects[index], newProjects[targetIndex]] = [newProjects[targetIndex], newProjects[index]];
+    const p1 = newProjects[index];
+    const p2 = newProjects[targetIndex];
     
-    // Prepare orders for API
-    const orders = newProjects.map((p, i) => ({ id: p.id, order_index: i }));
-    
+    if (!supabase) return;
+
+    setIsSaving(true);
     try {
-      const res = await fetch('/api/projects/reorder', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orders, token })
-      });
-      if (res.ok) {
+      const { error: e1 } = await supabase.from('projects').update({ order_index: targetIndex }).eq('id', p1.id);
+      const { error: e2 } = await supabase.from('projects').update({ order_index: index }).eq('id', p2.id);
+      
+      if (!e1 && !e2) {
         onUpdate();
+      } else {
+        console.error('Move Error:', e1 || e2);
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   if (!isLoggedIn) {
     return (
-      <div className="fixed inset-0 z-[100] bg-[#F5F2ED]/95 backdrop-blur-xl flex items-center justify-center p-6">
-        <div className="w-full max-w-md glass p-8 rounded-3xl shadow-2xl">
-          <h2 className="text-2xl font-bold mb-6 text-black">관리자 로그인</h2>
+      <div className="fixed inset-0 z-[100] bg-paper/95 backdrop-blur-xl flex items-center justify-center p-6">
+        <div className="w-full max-w-md glass p-8 rounded-3xl shadow-2xl border-cocoa/10">
+          <h2 className="text-2xl font-bold mb-2 text-cocoa">관리자 로그인</h2>
+          <p className="text-sm text-cocoa/60 mb-6">
+            {import.meta.env.VITE_ADMIN_PASSWORD ? '설정하신 비밀번호를 입력하세요.' : '비밀번호가 설정되지 않았습니다. 기본값 "admin"을 사용하세요.'}
+          </p>
           <input 
             type="password" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
             placeholder="비밀번호"
-            className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 mb-6 focus:outline-none focus:border-black/40 text-black font-medium"
+            className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 mb-6 focus:outline-none focus:border-sky-hover text-cocoa font-medium"
           />
           <div className="flex gap-4">
-            <button onClick={handleLogin} className="flex-1 py-3 bg-black text-white font-bold rounded-xl hover:bg-black/80 transition-colors">로그인</button>
-            <button onClick={onClose} className="flex-1 py-3 border border-black/20 rounded-xl text-black font-bold hover:bg-black/5 transition-colors">취소</button>
+            <button onClick={handleLogin} className="flex-1 py-3 bg-cocoa text-white font-bold rounded-xl hover:bg-sky-hover transition-colors">로그인</button>
+            <button onClick={onClose} className="flex-1 py-3 border border-border rounded-xl text-cocoa font-bold hover:bg-paper transition-colors">취소</button>
           </div>
         </div>
       </div>
@@ -656,32 +760,42 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] bg-[#F5F2ED] overflow-y-auto text-black">
+    <div className="fixed inset-0 z-[100] bg-paper overflow-y-auto text-cocoa">
       <div className="max-w-5xl mx-auto p-6 md:p-12">
         <div className="flex items-center justify-between mb-12">
           <h2 className="text-3xl font-bold">대시보드</h2>
           <div className="flex gap-4">
-            <button onClick={() => setIsLoggedIn(false)} className="p-3 glass rounded-xl text-black"><LogOut size={20} /></button>
-            <button onClick={onClose} className="p-3 glass rounded-xl text-black"><X size={20} /></button>
+            <button 
+              onClick={() => {
+                if (window.confirm('로그아웃 하시겠습니까?')) {
+                  setIsLoggedIn(false);
+                }
+              }} 
+              className="p-3 glass rounded-xl text-cocoa hover:bg-sky/20 transition-colors"
+              title="로그아웃"
+            >
+              <LogOut size={20} />
+            </button>
+            <button onClick={onClose} className="p-3 glass rounded-xl text-cocoa hover:bg-sky/20 transition-colors" title="닫기"><X size={20} /></button>
           </div>
         </div>
 
         <div className="flex gap-4 mb-8">
           <button 
             onClick={() => setActiveTab('projects')}
-            className={`px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'projects' ? 'bg-black text-white shadow-lg shadow-black/20' : 'glass text-black/60 hover:text-black'}`}
+            className={`px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'projects' ? 'bg-cocoa text-white shadow-lg shadow-cocoa/20' : 'glass text-cocoa/60 hover:text-cocoa'}`}
           >
             프로젝트 관리
           </button>
           <button 
             onClick={() => setActiveTab('experience')}
-            className={`px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'experience' ? 'bg-black text-white shadow-lg shadow-black/20' : 'glass text-black/60 hover:text-black'}`}
+            className={`px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'experience' ? 'bg-cocoa text-white shadow-lg shadow-cocoa/20' : 'glass text-cocoa/60 hover:text-cocoa'}`}
           >
             경력 관리
           </button>
           <button 
             onClick={() => setActiveTab('profile')}
-            className={`px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'profile' ? 'bg-black text-white shadow-lg shadow-black/20' : 'glass text-black/60 hover:text-black'}`}
+            className={`px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'profile' ? 'bg-cocoa text-white shadow-lg shadow-cocoa/20' : 'glass text-cocoa/60 hover:text-cocoa'}`}
           >
             프로필 관리
           </button>
@@ -691,20 +805,36 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
           <div className="space-y-6">
             <button 
               onClick={() => setEditingProject({ title: '', type: '', description: '', role: '', link: '', thumbnail: '', is_featured: false, is_main: false, order_index: projects.length, category: 'Corporate' })}
-              className="w-full py-4 border-2 border-dashed border-black/10 rounded-2xl flex items-center justify-center gap-2 text-black/20 hover:text-black hover:border-black/30 transition-all"
+              className="w-full py-4 border-2 border-dashed border-cocoa/10 rounded-2xl flex items-center justify-center gap-2 text-cocoa/20 hover:text-cocoa hover:border-cocoa/30 transition-all"
             >
               <Plus size={20} /> 새 프로젝트 추가
             </button>
 
             <div className="grid gap-4">
               {projects.map((p, idx) => (
-                <div key={p.id} className="glass p-6 rounded-2xl flex items-center justify-between">
+                <div key={p.id} className={`glass p-6 rounded-2xl flex items-center justify-between transition-opacity ${p.is_hidden ? 'opacity-50' : ''}`}>
                   <div className="flex items-center gap-4">
-                    {p.thumbnail && <img src={p.thumbnail} className="w-20 h-12 object-cover rounded-lg" />}
+                    <div className="relative">
+                      {p.thumbnail && <img src={p.thumbnail} className="w-20 h-12 object-cover rounded-lg" />}
+                      {p.is_hidden && (
+                        <div className="absolute inset-0 bg-cocoa/40 flex items-center justify-center rounded-lg">
+                          <EyeOff size={16} className="text-white" />
+                        </div>
+                      )}
+                    </div>
                     <div>
-                      <h4 className="font-bold text-black">{p.title}</h4>
-                      <p className="text-xs text-black/40">
-                        {p.category} | {p.is_main ? '메인' : p.is_featured ? '대표작' : '일반'}
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-bold text-cocoa">{p.title}</h4>
+                        {p.is_hidden && <span className="text-[10px] px-1.5 py-0.5 bg-cocoa/10 text-cocoa/60 rounded font-bold">숨김</span>}
+                      </div>
+                      <p className="text-xs text-cocoa/40">
+                        {{
+                          'Corporate': '기업 영상',
+                          'Education': '교육/강의',
+                          'Interview': '인터뷰',
+                          'Sketch/Event': '스케치/행사',
+                          'Shorts': '숏폼/SNS'
+                        }[p.category] || p.category} | {p.is_main ? '메인' : p.is_featured ? '대표작' : '일반'}
                       </p>
                     </div>
                   </div>
@@ -713,19 +843,26 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
                       <button 
                         disabled={idx === 0}
                         onClick={() => moveProject(idx, 'up')}
-                        className="p-1 hover:bg-black/5 rounded disabled:opacity-20 text-black"
+                        className="p-1 hover:bg-cocoa/5 rounded disabled:opacity-20 text-cocoa"
                       >
                         <ChevronUp size={16} />
                       </button>
                       <button 
                         disabled={idx === projects.length - 1}
                         onClick={() => moveProject(idx, 'down')}
-                        className="p-1 hover:bg-black/5 rounded disabled:opacity-20 text-black"
+                        className="p-1 hover:bg-cocoa/5 rounded disabled:opacity-20 text-cocoa"
                       >
                         <ChevronDown size={16} />
                       </button>
                     </div>
-                    <button onClick={() => setEditingProject(p)} className="p-2 hover:bg-black/5 rounded-lg text-black"><Edit2 size={18} /></button>
+                    <button onClick={() => setEditingProject(p)} className="p-2 hover:bg-cocoa/5 rounded-lg text-cocoa"><Edit2 size={18} /></button>
+                    <button 
+                      onClick={() => saveProject({ ...p, is_hidden: !p.is_hidden })} 
+                      className={`p-2 rounded-lg transition-colors ${p.is_hidden ? 'bg-cocoa/10 text-cocoa/40' : 'hover:bg-cocoa/5 text-cocoa'}`}
+                      title={p.is_hidden ? '숨김 해제' : '숨기기'}
+                    >
+                      {p.is_hidden ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                     <button onClick={() => deleteProject(p.id)} className="p-2 hover:bg-red-500/10 text-red-500 rounded-lg"><Trash2 size={18} /></button>
                   </div>
                 </div>
@@ -735,94 +872,125 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
         )}
 
         {activeTab === 'experience' && editingExp && (
-          <div className="glass p-8 rounded-3xl space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-xs font-bold text-black/80 mb-2 uppercase">역할/직무</label>
-                <input 
-                  value={editingExp.role || ''} 
-                  onChange={e => setEditingExp({...editingExp, role: e.target.value})}
-                  className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
-                />
+          <div className="glass p-8 rounded-3xl space-y-8 border-cocoa/10">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">경력 정보 설정</h3>
+              <button 
+                onClick={() => setEditingExp({ ...editingExp, ...DEFAULT_EXPERIENCE })}
+                className="text-xs font-bold px-3 py-1 rounded-lg bg-sky/10 text-sky hover:bg-sky/20 transition-colors"
+              >
+                기본 내용 불러오기
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              <h3 className="text-lg font-bold border-b border-cocoa/10 pb-2">기본 정보</h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">역할/직무</label>
+                  <input 
+                    value={editingExp.role || ''} 
+                    onChange={e => setEditingExp({...editingExp, role: e.target.value})}
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">기간</label>
+                  <input 
+                    value={editingExp.period || ''} 
+                    onChange={e => setEditingExp({...editingExp, period: e.target.value})}
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-xs font-bold text-black/80 mb-2 uppercase">기간</label>
-                <input 
-                  value={editingExp.period || ''} 
-                  onChange={e => setEditingExp({...editingExp, period: e.target.value})}
-                  className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
-                />
+            </div>
+
+            <div className="space-y-6">
+              <h3 className="text-lg font-bold border-b border-cocoa/10 pb-2">상세 내용</h3>
+              <div className="grid gap-6">
+                <div>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">주요 분야</label>
+                  <input 
+                    value={editingExp.field || ''} 
+                    onChange={e => setEditingExp({...editingExp, field: e.target.value})}
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">협업 범위</label>
+                  <input 
+                    value={editingExp.scope || ''} 
+                    onChange={e => setEditingExp({...editingExp, scope: e.target.value})}
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">강점/특징</label>
+                  <input 
+                    value={editingExp.strengths || ''} 
+                    onChange={e => setEditingExp({...editingExp, strengths: e.target.value})}
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">협력 브랜드 (쉼표로 구분)</label>
+                  <textarea 
+                    value={editingExp.brands || ''} 
+                    onChange={e => setEditingExp({...editingExp, brands: e.target.value})}
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium h-20"
+                    placeholder="예: 삼성전자, 현대자동차, LG유플러스"
+                  />
+                </div>
               </div>
             </div>
-            <div>
-              <label className="block text-xs font-bold text-black/80 mb-2 uppercase">주요 분야</label>
-              <input 
-                value={editingExp.field || ''} 
-                onChange={e => setEditingExp({...editingExp, field: e.target.value})}
-                className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-black/80 mb-2 uppercase">협업 범위</label>
-              <input 
-                value={editingExp.scope || ''} 
-                onChange={e => setEditingExp({...editingExp, scope: e.target.value})}
-                className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-black/80 mb-2 uppercase">강점/특징</label>
-              <input 
-                value={editingExp.strengths || ''} 
-                onChange={e => setEditingExp({...editingExp, strengths: e.target.value})}
-                className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-black/80 mb-2 uppercase">협력 브랜드 (쉼표로 구분)</label>
-              <textarea 
-                value={editingExp.brands || ''} 
-                onChange={e => setEditingExp({...editingExp, brands: e.target.value})}
-                className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium h-20"
-                placeholder="예: 삼성전자, 현대자동차, LG유플러스"
-              />
-            </div>
-            <button onClick={saveExperience} className="w-full py-4 bg-black text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-black/80 transition-colors">
-              <Save size={20} /> 경력 정보 저장
+
+            <button 
+              disabled={isSaving}
+              onClick={saveExperience} 
+              className="w-full py-4 bg-cocoa text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-sky-hover transition-colors disabled:opacity-50"
+            >
+              {isSaving ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save size={20} />}
+              경력 정보 저장
             </button>
           </div>
         )}
 
         {/* Project Edit Modal */}
         {editingProject && (
-          <div className="fixed inset-0 z-[110] bg-[#F5F2ED]/95 flex items-center justify-center p-6 backdrop-blur-xl">
-            <div className="w-full max-w-2xl glass p-8 rounded-3xl max-h-[90vh] overflow-y-auto text-black">
+          <div className="fixed inset-0 z-[110] bg-cocoa/90 flex items-center justify-center p-6 backdrop-blur-xl">
+            <div className="w-full max-w-2xl glass p-8 rounded-3xl max-h-[90vh] overflow-y-auto text-cocoa">
               <h3 className="text-2xl font-bold mb-8">{editingProject.id ? '프로젝트 수정' : '새 프로젝트 등록'}</h3>
               <div className="grid gap-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs font-bold text-black/80 mb-2 uppercase">제목</label>
-                    <input value={editingProject.title || ''} onChange={e => setEditingProject({...editingProject, title: e.target.value})} className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium" />
+                    <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">제목</label>
+                    <input value={editingProject.title || ''} onChange={e => setEditingProject({...editingProject, title: e.target.value})} className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium" />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-black/80 mb-2 uppercase">카테고리</label>
-                    <select value={editingProject.category || 'Corporate'} onChange={e => setEditingProject({...editingProject, category: e.target.value})} className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium">
-                      {['Corporate', 'Education', 'Interview', 'Sketch/Event', 'Shorts'].map(c => <option key={c} value={c} className="bg-white">{c}</option>)}
+                    <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">카테고리</label>
+                    <select value={editingProject.category || 'Corporate'} onChange={e => setEditingProject({...editingProject, category: e.target.value})} className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium">
+                      {[
+                        {v: 'Corporate', l: '기업 영상'},
+                        {v: 'Education', l: '교육/강의'},
+                        {v: 'Interview', l: '인터뷰'},
+                        {v: 'Sketch/Event', l: '스케치/행사'},
+                        {v: 'Shorts', l: '숏폼/SNS'}
+                      ].map(c => <option key={c.v} value={c.v} className="bg-white">{c.l}</option>)}
                     </select>
                   </div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs font-bold text-black/80 mb-2 uppercase">유형 (라벨)</label>
-                    <input value={editingProject.type || ''} onChange={e => setEditingProject({...editingProject, type: e.target.value})} className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium" placeholder="예: 기업 홍보" />
+                    <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">유형 (라벨)</label>
+                    <input value={editingProject.type || ''} onChange={e => setEditingProject({...editingProject, type: e.target.value})} className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium" placeholder="예: 기업 홍보" />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-black/80 mb-2 uppercase">역할</label>
-                    <input value={editingProject.role || ''} onChange={e => setEditingProject({...editingProject, role: e.target.value})} className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium" placeholder="예: 편집 100%" />
+                    <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">역할</label>
+                    <input value={editingProject.role || ''} onChange={e => setEditingProject({...editingProject, role: e.target.value})} className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium" placeholder="예: 편집 100%" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">영상 링크 (YouTube/Vimeo/Instagram)</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">영상 링크 (YouTube/Vimeo/Instagram)</label>
                   <input 
                     value={editingProject.link || ''} 
                     onChange={async (e) => {
@@ -864,46 +1032,56 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
                         }
                       }
                     }} 
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium" 
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium" 
                     placeholder="링크를 입력하면 썸네일이 자동으로 추출됩니다."
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">썸네일 이미지</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">썸네일 이미지</label>
                   <div className="grid gap-4">
                     <div className="flex gap-2">
                       <input 
                         value={editingProject.thumbnail || ''} 
                         onChange={e => setEditingProject({...editingProject, thumbnail: e.target.value})} 
-                        className="flex-1 bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium" 
+                        className="flex-1 bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium" 
                         placeholder="이미지 URL을 입력하거나 파일을 업로드하세요."
                       />
                       {editingProject.thumbnail && (
-                        <div className="w-16 h-12 rounded-lg overflow-hidden border border-black/20 shrink-0">
+                        <div className="w-16 h-12 rounded-lg overflow-hidden border border-cocoa/20 shrink-0">
                           <img src={editingProject.thumbnail} className="w-full h-full object-cover" />
                         </div>
                       )}
                     </div>
                     
                     <div 
-                      className="relative border-2 border-dashed border-black/20 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 hover:border-black/40 transition-all cursor-pointer group"
+                      className="relative border-2 border-dashed border-cocoa/20 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 hover:border-sky-hover transition-all cursor-pointer group"
                       onDragOver={(e) => e.preventDefault()}
                       onDrop={async (e) => {
                         e.preventDefault();
                         const file = e.dataTransfer.files[0];
                         if (file) {
-                          const formData = new FormData();
-                          formData.append('file', file);
                           try {
-                            const res = await fetch('/api/upload', {
-                              method: 'POST',
-                              body: formData
-                            });
-                            const data = await res.json();
-                            if (data.url) {
-                              setEditingProject(prev => ({...prev!, thumbnail: data.url}));
+                            const fileExt = file.name.split('.').pop();
+                            const fileName = `${Math.random()}.${fileExt}`;
+                            const filePath = `uploads/${fileName}`;
+
+                            const { error: uploadError } = await supabase.storage
+                              .from('portfolio')
+                              .upload(filePath, file);
+
+                            if (uploadError) throw uploadError;
+
+                            const { data } = supabase.storage
+                              .from('portfolio')
+                              .getPublicUrl(filePath);
+
+                            if (data.publicUrl) {
+                              setEditingProject(prev => ({...prev!, thumbnail: data.publicUrl}));
                             }
-                          } catch (err) { console.error(err); }
+                          } catch (err) { 
+                            console.error(err);
+                            alert('이미지 업로드에 실패했습니다. Supabase Storage 설정을 확인해주세요.');
+                          }
                         }
                       }}
                       onClick={() => {
@@ -913,252 +1091,341 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
                         input.onchange = async (e: any) => {
                           const file = e.target.files[0];
                           if (file) {
-                            const formData = new FormData();
-                            formData.append('file', file);
                             try {
-                              const res = await fetch('/api/upload', {
-                                method: 'POST',
-                                body: formData
-                              });
-                              const data = await res.json();
-                              if (data.url) {
-                                setEditingProject(prev => ({...prev!, thumbnail: data.url}));
+                              const fileExt = file.name.split('.').pop();
+                              const fileName = `${Math.random()}.${fileExt}`;
+                              const filePath = `uploads/${fileName}`;
+
+                              const { error: uploadError } = await supabase.storage
+                                .from('portfolio')
+                                .upload(filePath, file);
+
+                              if (uploadError) throw uploadError;
+
+                              const { data } = supabase.storage
+                                .from('portfolio')
+                                .getPublicUrl(filePath);
+
+                              if (data.publicUrl) {
+                                setEditingProject(prev => ({...prev!, thumbnail: data.publicUrl}));
                               }
-                            } catch (err) { console.error(err); }
+                            } catch (err) { 
+                              console.error(err);
+                              alert('이미지 업로드에 실패했습니다. Supabase Storage 설정을 확인해주세요.');
+                            }
                           }
                         };
                         input.click();
                       }}
                     >
-                      <Upload size={24} className="text-black/40 group-hover:text-black transition-colors" />
-                      <p className="text-sm text-black/60 group-hover:text-black font-bold">클릭하거나 이미지 업로드</p>
+                      <Upload size={24} className="text-cocoa/40 group-hover:text-sky-hover transition-colors" />
+                      <p className="text-sm text-cocoa/60 group-hover:text-sky-hover font-bold">클릭하거나 이미지 업로드</p>
                     </div>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">설명</label>
-                  <textarea value={editingProject.description || ''} onChange={e => setEditingProject({...editingProject, description: e.target.value})} className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 h-24 font-medium" />
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">설명</label>
+                  <textarea value={editingProject.description || ''} onChange={e => setEditingProject({...editingProject, description: e.target.value})} className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 h-24 font-medium" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">작업 노트 (인사이트)</label>
-                  <textarea value={editingProject.notes || ''} onChange={e => setEditingProject({...editingProject, notes: e.target.value})} className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 h-20 font-medium" placeholder="이 영상에서 가장 신경 쓴 부분이나 해결한 문제를 적어주세요." />
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">작업 노트 (인사이트)</label>
+                  <textarea value={editingProject.notes || ''} onChange={e => setEditingProject({...editingProject, notes: e.target.value})} className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 h-20 font-medium" placeholder="이 영상에서 가장 신경 쓴 부분이나 해결한 문제를 적어주세요." />
                 </div>
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-3">
-                    <input type="checkbox" checked={editingProject.is_main || false} onChange={e => setEditingProject({...editingProject, is_main: e.target.checked})} className="w-5 h-5 rounded bg-black/5 border-black/10" />
+                    <input type="checkbox" checked={editingProject.is_main || false} onChange={e => setEditingProject({...editingProject, is_main: e.target.checked})} className="w-5 h-5 rounded bg-cocoa/5 border-cocoa/10" />
                     <label className="text-sm font-bold">메인 영상 설정 (Hero 섹션 노출)</label>
                   </div>
                   <div className="flex items-center gap-3">
-                    <input type="checkbox" checked={editingProject.is_featured || false} onChange={e => setEditingProject({...editingProject, is_featured: e.target.checked})} className="w-5 h-5 rounded bg-black/5 border-black/10" />
+                    <input type="checkbox" checked={editingProject.is_featured || false} onChange={e => setEditingProject({...editingProject, is_featured: e.target.checked})} className="w-5 h-5 rounded bg-cocoa/5 border-cocoa/10" />
                     <label className="text-sm font-bold">대표작 설정 (상단 3선에 노출)</label>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" checked={editingProject.is_hidden || false} onChange={e => setEditingProject({...editingProject, is_hidden: e.target.checked})} className="w-5 h-5 rounded bg-cocoa/5 border-cocoa/10" />
+                    <label className="text-sm font-bold">영상 숨기기 (홈페이지에서 숨김)</label>
                   </div>
                 </div>
                 <div className="flex gap-4 pt-4">
-                  <button onClick={() => saveProject(editingProject)} className="flex-1 py-4 bg-black text-white font-bold rounded-xl">프로젝트 저장</button>
-                  <button onClick={() => setEditingProject(null)} className="flex-1 py-4 glass rounded-xl">취소</button>
+                  <button 
+                    disabled={isSaving}
+                    onClick={() => saveProject(editingProject)} 
+                    className="flex-1 py-4 bg-cocoa text-white font-bold rounded-xl hover:bg-sky-hover transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isSaving ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save size={20} />}
+                    프로젝트 저장
+                  </button>
+                  <button onClick={() => setEditingProject(null)} className="flex-1 py-4 glass rounded-xl text-cocoa">취소</button>
                 </div>
               </div>
             </div>
           </div>
         )}
         {activeTab === 'profile' && editingProfile && (
-          <div className="glass p-8 rounded-3xl space-y-8">
+          <div className="glass p-8 rounded-3xl space-y-8 border-cocoa/10">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">전체 사이트 문구 설정</h3>
+              <button 
+                onClick={() => setEditingProfile({ ...editingProfile, ...DEFAULT_PROFILE })}
+                className="text-xs font-bold px-3 py-1 rounded-lg bg-sky/10 text-sky hover:bg-sky/20 transition-colors"
+              >
+                기본 내용 불러오기
+              </button>
+            </div>
             <div className="space-y-6">
-              <h3 className="text-lg font-bold border-b border-black/10 pb-2">General Settings</h3>
+              <h3 className="text-lg font-bold border-b border-cocoa/10 pb-2">기본 설정</h3>
               <div>
-                <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Site Name / Logo Text</label>
+                <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">사이트 이름 / 로고 텍스트</label>
                 <input 
                   value={editingProfile.site_name || ''} 
                   onChange={e => setEditingProfile({...editingProfile, site_name: e.target.value})}
-                  className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                  className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                 />
               </div>
             </div>
 
             <div className="space-y-6">
-              <h3 className="text-lg font-bold border-b border-black/10 pb-2">Hero Section</h3>
+              <h3 className="text-lg font-bold border-b border-cocoa/10 pb-2">히어로 섹션 (첫 화면)</h3>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Hero Title</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">상단 라벨 (배지)</label>
+                  <input 
+                    value={editingProfile.hero_label || ''} 
+                    onChange={e => setEditingProfile({...editingProfile, hero_label: e.target.value})}
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
+                    placeholder="예: Video Editor & Motion Designer"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">메인 타이틀</label>
                   <input 
                     value={editingProfile.hero_title || ''} 
                     onChange={e => setEditingProfile({...editingProfile, hero_title: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Hero Subtitle</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">서브 타이틀 (강조)</label>
                   <input 
                     value={editingProfile.hero_subtitle || ''} 
                     onChange={e => setEditingProfile({...editingProfile, hero_subtitle: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Hero Description</label>
+                <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">설명 문구</label>
                 <textarea 
                   value={editingProfile.hero_description || ''} 
                   onChange={e => setEditingProfile({...editingProfile, hero_description: e.target.value})}
-                  className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium h-24"
+                  className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium h-24"
                 />
               </div>
             </div>
 
             <div className="space-y-6">
-              <h3 className="text-lg font-bold border-b border-black/10 pb-2">About Section</h3>
+              <h3 className="text-lg font-bold border-b border-cocoa/10 pb-2">소개 섹션 (About)</h3>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">About Strengths Title</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">소개 섹션 제목</label>
                   <input 
                     value={editingProfile.about_strengths_title || ''} 
                     onChange={e => setEditingProfile({...editingProfile, about_strengths_title: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">About Subtitle (Large Text)</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">소개 서브타이틀 (큰 글씨)</label>
                   <textarea 
                     value={editingProfile.about_subtitle || ''} 
                     onChange={e => setEditingProfile({...editingProfile, about_subtitle: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium h-20"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium h-20"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-black/80 mb-2 uppercase">About Description (Small Text)</label>
+                <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">소개 상세 설명 (작은 글씨)</label>
                 <textarea 
                   value={editingProfile.about_text || ''} 
                   onChange={e => setEditingProfile({...editingProfile, about_text: e.target.value})}
-                  className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium h-32"
+                  className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium h-32"
                 />
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">강점 1 제목</label>
+                  <input 
+                    value={editingProfile.strength1_title || ''} 
+                    onChange={e => setEditingProfile({...editingProfile, strength1_title: e.target.value})}
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium mb-2"
+                  />
+                  <input 
+                    value={editingProfile.strength1_desc || ''} 
+                    onChange={e => setEditingProfile({...editingProfile, strength1_desc: e.target.value})}
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium text-sm"
+                    placeholder="설명"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">강점 2 제목</label>
+                  <input 
+                    value={editingProfile.strength2_title || ''} 
+                    onChange={e => setEditingProfile({...editingProfile, strength2_title: e.target.value})}
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium mb-2"
+                  />
+                  <input 
+                    value={editingProfile.strength2_desc || ''} 
+                    onChange={e => setEditingProfile({...editingProfile, strength2_desc: e.target.value})}
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium text-sm"
+                    placeholder="설명"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">강점 3 제목</label>
+                  <input 
+                    value={editingProfile.strength3_title || ''} 
+                    onChange={e => setEditingProfile({...editingProfile, strength3_title: e.target.value})}
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium mb-2"
+                  />
+                  <input 
+                    value={editingProfile.strength3_desc || ''} 
+                    onChange={e => setEditingProfile({...editingProfile, strength3_desc: e.target.value})}
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium text-sm"
+                    placeholder="설명"
+                  />
+                </div>
               </div>
             </div>
 
             <div className="space-y-6">
-              <h3 className="text-lg font-bold border-b border-black/10 pb-2">Featured & Work Titles</h3>
+              <h3 className="text-lg font-bold border-b border-cocoa/10 pb-2">프로젝트 섹션 제목 설정</h3>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Featured Title (EN)</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">대표작 섹션 제목 (영문)</label>
                   <input 
                     value={editingProfile.featured_title || ''} 
                     onChange={e => setEditingProfile({...editingProfile, featured_title: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Featured Subtitle (KR)</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">대표작 섹션 제목 (국문)</label>
                   <input 
                     value={editingProfile.featured_subtitle || ''} 
                     onChange={e => setEditingProfile({...editingProfile, featured_subtitle: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Work Title (EN)</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">전체작업 섹션 제목 (영문)</label>
                   <input 
                     value={editingProfile.work_title || ''} 
                     onChange={e => setEditingProfile({...editingProfile, work_title: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Work Subtitle (KR)</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">전체작업 섹션 제목 (국문)</label>
                   <input 
                     value={editingProfile.work_subtitle || ''} 
                     onChange={e => setEditingProfile({...editingProfile, work_subtitle: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
               </div>
             </div>
 
             <div className="space-y-6">
-              <h3 className="text-lg font-bold border-b border-black/10 pb-2">Contact Section</h3>
+              <h3 className="text-lg font-bold border-b border-cocoa/10 pb-2">연락처 섹션 (Contact)</h3>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Contact Title (EN)</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">연락처 섹션 제목 (영문)</label>
                   <input 
                     value={editingProfile.contact_title || ''} 
                     onChange={e => setEditingProfile({...editingProfile, contact_title: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Contact Subtitle (KR/EN)</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">연락처 메인 문구</label>
                   <input 
                     value={editingProfile.contact_subtitle || ''} 
                     onChange={e => setEditingProfile({...editingProfile, contact_subtitle: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Email</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">이메일 주소</label>
                   <input 
                     value={editingProfile.contact_email || ''} 
                     onChange={e => setEditingProfile({...editingProfile, contact_email: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Kakao Link</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">카카오톡 오픈채팅 링크</label>
                   <input 
                     value={editingProfile.contact_kakao || ''} 
                     onChange={e => setEditingProfile({...editingProfile, contact_kakao: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
               </div>
             </div>
 
             <div className="space-y-6">
-              <h3 className="text-lg font-bold border-b border-black/10 pb-2">Experience Section Labels</h3>
+              <h3 className="text-lg font-bold border-b border-cocoa/10 pb-2">경력 섹션 라벨 설정</h3>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Experience Title</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">경력 섹션 제목</label>
                   <input 
                     value={editingProfile.exp_title || ''} 
                     onChange={e => setEditingProfile({...editingProfile, exp_title: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Field Label</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">분야 라벨명</label>
                   <input 
                     value={editingProfile.exp_label_field || ''} 
                     onChange={e => setEditingProfile({...editingProfile, exp_label_field: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Scope Label</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">범위 라벨명</label>
                   <input 
                     value={editingProfile.exp_label_scope || ''} 
                     onChange={e => setEditingProfile({...editingProfile, exp_label_scope: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Strengths Label</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">강점 라벨명</label>
                   <input 
                     value={editingProfile.exp_label_strengths || ''} 
                     onChange={e => setEditingProfile({...editingProfile, exp_label_strengths: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/80 mb-2 uppercase">Brands Label</label>
+                  <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">브랜드 라벨명</label>
                   <input 
                     value={editingProfile.exp_label_brands || ''} 
                     onChange={e => setEditingProfile({...editingProfile, exp_label_brands: e.target.value})}
-                    className="w-full bg-black/5 border border-black/20 rounded-xl px-4 py-3 font-medium"
+                    className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
                   />
                 </div>
               </div>
             </div>
 
-            <button onClick={saveProfile} className="w-full py-4 bg-black text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-black/80 transition-colors">
-              <Save size={20} /> 프로필 정보 저장
+            <button 
+              disabled={isSaving}
+              onClick={saveProfile} 
+              className="w-full py-4 bg-cocoa text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-sky-hover transition-colors disabled:opacity-50"
+            >
+              {isSaving ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save size={20} />}
+              프로필 정보 저장
             </button>
           </div>
         )}
@@ -1177,14 +1444,21 @@ export default function App() {
   const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
 
   const fetchData = async () => {
-    const [pRes, eRes, prRes] = await Promise.all([
-      fetch('/api/projects'),
-      fetch('/api/experience'),
-      fetch('/api/profile')
-    ]);
-    setProjects(await pRes.json());
-    setExperience(await eRes.json());
-    setProfile(await prRes.json());
+    if (!supabase) return;
+    
+    try {
+      const [pRes, eRes, prRes] = await Promise.all([
+        supabase.from('projects').select('*').order('order_index', { ascending: true }),
+        supabase.from('experience').select('*').single(),
+        supabase.from('profile').select('*').single()
+      ]);
+      
+      if (pRes.data) setProjects(pRes.data);
+      if (eRes.data) setExperience(eRes.data);
+      if (prRes.data) setProfile(prRes.data);
+    } catch (err) {
+      console.error('Fetch Data Error:', err);
+    }
   };
 
   useEffect(() => {
@@ -1192,22 +1466,22 @@ export default function App() {
   }, []);
 
   return (
-    <div className="selection:bg-black selection:text-white">
+    <div className="selection:bg-sky selection:text-cocoa">
       <Navbar profile={profile} onAdminClick={() => setIsAdminOpen(true)} />
       
       <main>
         <Hero 
-          mainProject={projects.find(p => p.is_main) || null} 
+          mainProject={projects.find(p => p.is_main && !p.is_hidden) || null} 
           profile={profile}
           onProjectClick={(p) => setSelectedVideoUrl(p.link)} 
         />
         <FeaturedSection 
-          projects={projects.filter(p => p.is_featured)} 
+          projects={projects.filter(p => p.is_featured && !p.is_hidden)} 
           profile={profile}
           onProjectClick={(p) => setSelectedVideoUrl(p.link)} 
         />
         <WorkGrid 
-          projects={projects} 
+          projects={projects.filter(p => !p.is_hidden)} 
           profile={profile}
           onProjectClick={(p) => setSelectedVideoUrl(p.link)} 
         />
@@ -1215,14 +1489,14 @@ export default function App() {
         <ContactSection profile={profile} />
       </main>
 
-      <footer className="py-12 border-t border-black/10">
+      <footer className="py-12 border-t border-cocoa/10">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8">
-          <p className="text-2xl font-bold tracking-tighter font-serif italic text-black">{profile?.site_name || 'TEDIO'}</p>
-          <p className="text-sm text-black/60">© 2024 {profile?.site_name || 'TEDIO'}. All rights reserved.</p>
-          <div className="flex gap-6 text-black/80">
-            <a href="#" className="hover:text-black transition-colors"><Instagram size={20} /></a>
-            <a href="#" className="hover:text-black transition-colors"><Youtube size={20} /></a>
-            <a href="#" className="hover:text-black transition-colors"><Github size={20} /></a>
+          <p className="text-2xl font-bold tracking-tighter font-serif italic text-cocoa">{profile?.site_name || 'TEDIO'}</p>
+          <p className="text-sm text-cocoa/60">© 2024 {profile?.site_name || 'TEDIO'}. All rights reserved.</p>
+          <div className="flex gap-6 text-cocoa/80">
+            <a href="#" className="hover:text-sky-hover transition-colors"><Instagram size={20} /></a>
+            <a href="#" className="hover:text-sky-hover transition-colors"><Youtube size={20} /></a>
+            <a href="#" className="hover:text-sky-hover transition-colors"><Github size={20} /></a>
           </div>
         </div>
       </footer>

@@ -8,6 +8,7 @@ export interface Project {
   thumbnail: string;
   is_featured: boolean;
   is_main: boolean;
+  is_hidden: boolean;
   order_index: number;
   category: string;
   notes?: string;
@@ -28,6 +29,7 @@ export interface Profile {
   hero_title: string;
   hero_subtitle: string;
   hero_description: string;
+  hero_label: string;
   about_text: string;
   featured_title: string;
   featured_subtitle: string;
@@ -46,4 +48,10 @@ export interface Profile {
   about_subtitle: string;
   about_strengths_title: string;
   site_name: string;
+  strength1_title?: string;
+  strength1_desc?: string;
+  strength2_title?: string;
+  strength2_desc?: string;
+  strength3_title?: string;
+  strength3_desc?: string;
 }
