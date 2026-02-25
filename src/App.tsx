@@ -582,7 +582,10 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
   }, [profile]);
 
   const handleLogin = async () => {
-    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'admin';
+    const envPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+    const dbPassword = profile?.admin_password;
+    const adminPassword = dbPassword || envPassword || 'admin';
+    
     if (password === adminPassword) {
       setIsLoggedIn(true);
       setToken('admin-session');
@@ -740,7 +743,7 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
         <div className="w-full max-w-md glass p-8 rounded-3xl shadow-2xl border-cocoa/10">
           <h2 className="text-2xl font-bold mb-2 text-cocoa">관리자 로그인</h2>
           <p className="text-sm text-cocoa/60 mb-6">
-            {import.meta.env.VITE_ADMIN_PASSWORD ? '설정하신 비밀번호를 입력하세요.' : '비밀번호가 설정되지 않았습니다. 기본값 "admin"을 사용하세요.'}
+            {profile?.admin_password || import.meta.env.VITE_ADMIN_PASSWORD ? '설정하신 비밀번호를 입력하세요.' : '비밀번호가 설정되지 않았습니다. 기본값 "admin"을 사용하세요.'}
           </p>
           <input 
             type="password" 
@@ -1179,6 +1182,16 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
                   value={editingProfile.site_name || ''} 
                   onChange={e => setEditingProfile({...editingProfile, site_name: e.target.value})}
                   className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-cocoa/80 mb-2 uppercase">관리자 비밀번호</label>
+                <input 
+                  type="password"
+                  value={editingProfile.admin_password || ''} 
+                  onChange={e => setEditingProfile({...editingProfile, admin_password: e.target.value})}
+                  className="w-full bg-cocoa/5 border border-cocoa/20 rounded-xl px-4 py-3 font-medium"
+                  placeholder="관리자 페이지 접속 시 사용할 비밀번호"
                 />
               </div>
             </div>

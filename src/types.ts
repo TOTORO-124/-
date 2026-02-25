@@ -48,6 +48,7 @@ export interface Profile {
   about_subtitle: string;
   about_strengths_title: string;
   site_name: string;
+  admin_password?: string;
   strength1_title?: string;
   strength1_desc?: string;
   strength2_title?: string;
