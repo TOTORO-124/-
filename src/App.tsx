@@ -276,7 +276,7 @@ const FeaturedSection = ({ projects, profile, onProjectClick }: { projects: Proj
         <div className="flex items-end justify-between mb-16">
           <div>
             <h2 className="text-xs font-bold tracking-[0.3em] uppercase text-muted mb-4">{profile?.featured_title || 'Featured Projects'}</h2>
-            <p className="text-4xl font-serif italic text-ink">{profile?.featured_subtitle || '대표작 3선'}</p>
+            <p className="text-4xl font-bold text-ink">{profile?.featured_subtitle || '대표작 3선'}</p>
           </div>
         </div>
 
@@ -363,7 +363,7 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
           <div>
             <h2 className="text-xs font-bold tracking-[0.3em] uppercase text-muted mb-4">{profile?.work_title || 'Work Archive'}</h2>
-            <p className="text-4xl font-serif italic text-ink">{profile?.work_subtitle || '전체 작업 모음'}</p>
+            <p className="text-4xl font-bold text-ink">{profile?.work_subtitle || '전체 작업 모음'}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {categories.map(cat => (
@@ -455,10 +455,10 @@ const AboutSection = ({ experience, profile }: { experience: Experience | null, 
         >
           <h2 className="text-xs font-bold tracking-[0.3em] uppercase text-muted mb-8">{profile?.about_strengths_title || 'About & Strengths'}</h2>
           <div className="space-y-10">
-            <p className="text-3xl md:text-4xl font-serif italic leading-tight text-ink whitespace-pre-line">
+            <p className="text-2xl md:text-3xl font-bold leading-tight text-ink whitespace-pre-line">
               {profile?.about_subtitle || '영상의 목적과 톤을 먼저 이해하고, \n구조와 리듬으로 전달력을 높이는 편집을 지향합니다.'}
             </p>
-            <p className="text-lg text-muted leading-relaxed whitespace-pre-line font-medium border-l-4 border-cocoa pl-6">
+            <p className="text-base md:text-lg text-muted leading-relaxed whitespace-pre-line font-medium border-l-4 border-cocoa pl-6 max-w-2xl">
               {profile?.about_text || '기업/교육/인터뷰 기반 작업을 중심으로, 깔끔하고 안정적인 결과물을 만듭니다. \n단순한 컷 편집을 넘어 시청자가 끝까지 몰입할 수 있는 흐름을 설계합니다.'}
             </p>
             
