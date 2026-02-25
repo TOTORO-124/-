@@ -5,13 +5,16 @@
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
   --font-serif: "Pretendard Variable", Pretendard, sans-serif;
 
-  --color-cocoa: #6B4F3A;
-  --color-sky: #4A6FA5;
-  --color-sky-hover: #365584;
-  --color-paper: #FCFBF9;
-  --color-ink: #2D241E;
+  --color-cocoa: #5B3A29;      /* Primary Brown */
+  --color-cocoa-hover: #4A2F22; /* Darker Brown for hover */
+  --color-sky: #5B3A29;        /* Mapping sky to cocoa for point consistency */
+  --color-sky-hover: #4A2F22;
+  --color-paper: #F8F6F2;      /* Off White */
+  --color-beige: #F3ECE2;      /* Card/Section Beige */
+  --color-ink: #1C1C1C;        /* Soft Black */
+  --color-muted: #6C6C6C;      /* Muted Text Gray */
+  --color-border: #D8D2C8;     /* Border Gray */
   --color-surface: #FFFFFF;
-  --color-border: #F0EBE6;
 }
 
 @layer base {

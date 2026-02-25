@@ -212,7 +212,7 @@ const Hero = ({ mainProject, profile, onProjectClick }: { mainProject: Project |
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
       {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-sky/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cocoa/5 rounded-full blur-[120px] pointer-events-none" />
       
       <div className="max-w-7xl mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
         <motion.div
@@ -220,21 +220,21 @@ const Hero = ({ mainProject, profile, onProjectClick }: { mainProject: Project |
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <span className="inline-block px-3 py-1 rounded-full border border-sky-hover/30 bg-sky/10 text-xs font-bold text-cocoa mb-6">
+          <span className="inline-block px-3 py-1 rounded-full border border-cocoa/20 bg-beige text-xs font-bold text-cocoa mb-6 uppercase tracking-wider">
             {profile?.hero_label || 'Video Editor & Motion Designer'}
           </span>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.1] text-cocoa">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.1] text-ink">
             {profile?.hero_title || '브랜드 톤은 지키고,'}<br />
-            <span className="text-sky-hover">{profile?.hero_subtitle || '메시지는 더 또렷하게.'}</span>
+            <span className="text-cocoa">{profile?.hero_subtitle || '메시지는 더 또렷하게.'}</span>
           </h1>
-          <p className="text-lg md:text-xl text-ink/80 mb-10 max-w-xl leading-relaxed whitespace-pre-line">
+          <p className="text-lg md:text-xl text-muted mb-10 max-w-xl leading-relaxed whitespace-pre-line font-medium">
             {profile?.hero_description || '기업·교육·인터뷰 중심의 영상 편집/모션 작업을 합니다.\n목적에 맞는 구조, 자막 가독성, 리듬감 있는 편집에 강합니다.'}
           </p>
           <div className="flex flex-wrap gap-4">
-            <a href="#featured" className="px-8 py-4 rounded-full bg-cocoa text-white font-bold flex items-center gap-2 hover:bg-sky-hover transition-all hover:scale-105">
+            <a href="#featured" className="px-8 py-4 rounded-full bg-cocoa text-paper font-bold flex items-center gap-2 hover:bg-cocoa-hover transition-all hover:scale-105 shadow-lg shadow-cocoa/20">
               대표작 보기 <ChevronRight size={18} />
             </a>
-            <a href="#contact" className="px-8 py-4 rounded-full border border-border text-cocoa font-bold hover:bg-sky/5 transition-colors">
+            <a href="#contact" className="px-8 py-4 rounded-full border-2 border-cocoa text-cocoa font-bold hover:bg-cocoa/5 transition-colors">
               협업/채용 문의
             </a>
           </div>
@@ -271,12 +271,12 @@ const Hero = ({ mainProject, profile, onProjectClick }: { mainProject: Project |
 
 const FeaturedSection = ({ projects, profile, onProjectClick }: { projects: Project[], profile: Profile | null, onProjectClick: (p: Project) => void }) => {
   return (
-    <section id="featured" className="py-32 bg-cocoa/5">
+    <section id="featured" className="py-32 bg-beige">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-end justify-between mb-16">
           <div>
-            <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-cocoa/70 mb-4">{profile?.featured_title || 'Featured Projects'}</h2>
-            <p className="text-4xl font-serif italic text-cocoa">{profile?.featured_subtitle || '대표작 3선'}</p>
+            <h2 className="text-xs font-bold tracking-[0.3em] uppercase text-muted mb-4">{profile?.featured_title || 'Featured Projects'}</h2>
+            <p className="text-4xl font-serif italic text-ink">{profile?.featured_subtitle || '대표작 3선'}</p>
           </div>
         </div>
 
@@ -291,7 +291,7 @@ const FeaturedSection = ({ projects, profile, onProjectClick }: { projects: Proj
               className="group cursor-pointer"
               onClick={() => onProjectClick(project)}
             >
-              <div className="relative aspect-[16/9] rounded-2xl overflow-hidden mb-6 border border-cocoa/5">
+              <div className="relative aspect-[16/9] rounded-2xl overflow-hidden mb-6 border border-border shadow-sm">
                 <img 
                   src={project.thumbnail || "https://picsum.photos/seed/project/800/450"} 
                   alt={project.title} 
@@ -299,30 +299,30 @@ const FeaturedSection = ({ projects, profile, onProjectClick }: { projects: Proj
                 />
                 <div className="absolute inset-0 bg-cocoa/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                   <div className="w-16 h-16 rounded-full glass flex items-center justify-center">
-                    <Play fill="#7ED6C1" size={24} />
+                    <Play fill="#F8F6F2" size={24} className="text-paper" />
                   </div>
                 </div>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-cocoa">{project.title}</h3>
-                  <span className="text-xs font-medium px-2 py-1 rounded bg-sky/20 text-cocoa">{project.type}</span>
+                  <h3 className="text-xl font-bold text-ink">{project.title}</h3>
+                  <span className="text-[10px] font-bold px-2 py-1 rounded bg-cocoa/10 text-cocoa border border-cocoa/20 uppercase tracking-wider">{project.type}</span>
                 </div>
-                <p className="text-ink/80 text-sm leading-relaxed">{project.description}</p>
+                <p className="text-muted text-sm leading-relaxed font-medium">{project.description}</p>
                 {project.notes && (
-                  <div className="p-3 rounded-xl bg-cocoa/5 border border-cocoa/5 italic text-[13px] text-cocoa/80">
+                  <div className="p-4 rounded-2xl bg-paper border border-border italic text-xs text-muted leading-relaxed">
                     " {project.notes} "
                   </div>
                 )}
-                <div className="pt-2 border-t border-cocoa/10">
-                  <p className="text-[10px] uppercase tracking-wider text-cocoa/70 font-bold mb-1">My Role</p>
-                  <p className="text-xs text-cocoa font-medium">{project.role}</p>
+                <div className="pt-3 border-t border-border">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-bold mb-1">My Role</p>
+                  <p className="text-xs text-ink font-bold">{project.role}</p>
                 </div>
               </div>
             </motion.div>
           )) : (
-            <div className="col-span-full py-20 text-center glass rounded-3xl">
-              <p className="text-cocoa/40 font-serif italic text-xl">표시할 대표작이 없습니다.</p>
+            <div className="col-span-full py-20 text-center glass rounded-3xl border-border">
+              <p className="text-muted font-serif italic text-xl">표시할 대표작이 없습니다.</p>
             </div>
           )}
         </div>
@@ -362,8 +362,8 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
           <div>
-            <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-cocoa/80 mb-4">{profile?.work_title || 'Work Archive'}</h2>
-            <p className="text-4xl font-serif italic text-cocoa">{profile?.work_subtitle || '전체 작업 모음'}</p>
+            <h2 className="text-xs font-bold tracking-[0.3em] uppercase text-muted mb-4">{profile?.work_title || 'Work Archive'}</h2>
+            <p className="text-4xl font-serif italic text-ink">{profile?.work_subtitle || '전체 작업 모음'}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {categories.map(cat => (
@@ -371,7 +371,7 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
                 key={cat.v}
                 onClick={() => setFilter(cat.v)}
                 className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                  filter === cat.v ? 'bg-cocoa text-white' : 'border border-cocoa/30 text-cocoa hover:border-cocoa/50'
+                  filter === cat.v ? 'bg-cocoa text-paper shadow-md' : 'border border-border text-muted hover:border-cocoa/50 hover:text-cocoa'
                 }`}
               >
                 {cat.l}
@@ -415,10 +415,10 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
                     alt={project.title} 
                     className="w-full h-full object-cover grayscale blur-[2px] group-hover:grayscale-0 group-hover:blur-0 transition-all duration-500"
                   />
-                  <div className="absolute inset-0 bg-sky/40 opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end backdrop-blur-sm">
-                    <p className="text-xs font-bold text-cocoa mb-1">{project.type}</p>
-                    <h4 className="text-sm font-bold mb-2 text-cocoa">{project.title}</h4>
-                    <p className="text-[10px] text-cocoa/90 line-clamp-1">{project.role}</p>
+                  <div className="absolute inset-0 bg-ink/70 opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end backdrop-blur-sm">
+                    <p className="text-[10px] font-bold text-paper/80 mb-1 uppercase tracking-widest">{project.type}</p>
+                    <h4 className="text-base font-bold mb-2 text-paper">{project.title}</h4>
+                    <p className="text-[10px] text-paper/60 line-clamp-1 font-medium">{project.role}</p>
                   </div>
                 </motion.div>
               )) : (
@@ -446,72 +446,82 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
 
 const AboutSection = ({ experience, profile }: { experience: Experience | null, profile: Profile | null }) => {
   return (
-    <section id="about" className="py-32 bg-cocoa/5">
+    <section id="about" className="py-32 bg-beige">
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-20 items-center">
-        <div>
-          <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-cocoa/70 mb-8">{profile?.about_strengths_title || 'About & Strengths'}</h2>
-          <div className="space-y-8">
-            <p className="text-2xl font-light leading-relaxed text-cocoa/90 whitespace-pre-line">
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-xs font-bold tracking-[0.3em] uppercase text-muted mb-8">{profile?.about_strengths_title || 'About & Strengths'}</h2>
+          <div className="space-y-10">
+            <p className="text-3xl md:text-4xl font-serif italic leading-tight text-ink whitespace-pre-line">
               {profile?.about_subtitle || '영상의 목적과 톤을 먼저 이해하고, \n구조와 리듬으로 전달력을 높이는 편집을 지향합니다.'}
             </p>
-            <p className="text-ink/80 leading-relaxed whitespace-pre-line">
+            <p className="text-lg text-muted leading-relaxed whitespace-pre-line font-medium border-l-4 border-cocoa pl-6">
               {profile?.about_text || '기업/교육/인터뷰 기반 작업을 중심으로, 깔끔하고 안정적인 결과물을 만듭니다. \n단순한 컷 편집을 넘어 시청자가 끝까지 몰입할 수 있는 흐름을 설계합니다.'}
             </p>
             
-            <div className="grid grid-cols-1 gap-6 pt-8">
+            <div className="grid grid-cols-1 gap-8 pt-6">
               {[
                 { title: profile?.strength1_title || '구조 설계', desc: profile?.strength1_desc || '흐름이 자연스럽고 이해가 쉬운 편집' },
                 { title: profile?.strength2_title || '자막 가독성', desc: profile?.strength2_desc || '화면을 해치지 않는 자막 배치와 리듬' },
                 { title: profile?.strength3_title || '마감 퀄리티', desc: profile?.strength3_desc || '사운드 정리, 템포, 전체 톤 통일' }
               ].map((strength, i) => (
-                <div key={i} className="flex gap-4">
-                  <div className="w-1 h-full bg-sky-hover/30 rounded-full" />
+                <div key={i} className="flex gap-6 group">
+                  <div className="w-14 h-14 shrink-0 rounded-2xl bg-paper border border-border flex items-center justify-center text-cocoa font-bold text-xl group-hover:bg-cocoa group-hover:text-paper transition-all duration-500 shadow-sm">
+                    0{i + 1}
+                  </div>
                   <div>
-                    <h4 className="font-bold mb-1 text-cocoa">{strength.title}</h4>
-                    <p className="text-sm text-cocoa/70">{strength.desc}</p>
+                    <h4 className="text-xl font-bold text-ink mb-1 group-hover:text-cocoa transition-colors">{strength.title}</h4>
+                    <p className="text-muted font-medium leading-relaxed">{strength.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
 
         <div className="space-y-12">
-          <div id="experience" className="glass p-8 rounded-3xl border-cocoa/10">
-            <h3 className="text-xs font-bold tracking-widest uppercase text-cocoa/60 mb-6">{profile?.exp_title || 'Experience Snapshot'}</h3>
+          <motion.div 
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            id="experience" 
+            className="bg-paper p-10 rounded-3xl border border-border shadow-xl shadow-cocoa/5"
+          >
+            <h3 className="text-[10px] font-bold tracking-[0.3em] uppercase text-muted mb-8">{profile?.exp_title || 'Experience Snapshot'}</h3>
             {experience ? (
-              <div className="space-y-6">
+              <div className="space-y-8">
                 <div>
-                  <p className="text-xl font-bold mb-1 text-cocoa">{experience.role}</p>
-                  <p className="text-sm text-cocoa/80">{experience.period}</p>
+                  <p className="text-2xl font-bold mb-2 text-ink">{experience.role}</p>
+                  <p className="text-sm text-muted font-bold tracking-wider">{experience.period}</p>
                 </div>
                 <div className="grid gap-4">
-                  <div className="flex justify-between text-sm py-3 border-b border-cocoa/10">
-                    <span className="text-cocoa/80">{profile?.exp_label_field || '주 작업 분야'}</span>
-                    <span className="text-cocoa font-medium">{experience.field}</span>
-                  </div>
-                  <div className="flex justify-between text-sm py-3 border-b border-cocoa/10">
-                    <span className="text-cocoa/80">{profile?.exp_label_scope || '협업 범위'}</span>
-                    <span className="text-cocoa font-medium">{experience.scope}</span>
-                  </div>
-                  <div className="flex justify-between text-sm py-3 border-b border-cocoa/10">
-                    <span className="text-cocoa/80">{profile?.exp_label_strengths || '강점'}</span>
-                    <span className="text-cocoa font-medium">{experience.strengths}</span>
-                  </div>
-                  <div className="flex flex-col gap-2 py-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-cocoa/60">{profile?.exp_label_brands || '협력 브랜드'}</span>
-                    <p className="text-sm text-cocoa font-medium leading-relaxed">{experience.brands}</p>
+                  {[
+                    { l: profile?.exp_label_field || '주 작업 분야', v: experience.field },
+                    { l: profile?.exp_label_scope || '협업 범위', v: experience.scope },
+                    { l: profile?.exp_label_strengths || '강점', v: experience.strengths }
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex flex-col gap-1 py-4 border-b border-border last:border-0">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-muted">{item.l}</span>
+                      <span className="text-ink font-bold text-base">{item.v}</span>
+                    </div>
+                  ))}
+                  <div className="flex flex-col gap-2 pt-4">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted">{profile?.exp_label_brands || '협력 브랜드'}</span>
+                    <p className="text-sm text-ink font-bold leading-relaxed">{experience.brands}</p>
                   </div>
                 </div>
               </div>
             ) : (
-              <p className="text-cocoa/60 italic">Loading experience data...</p>
+              <p className="text-muted italic">Loading experience data...</p>
             )}
-          </div>
+          </motion.div>
 
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-3">
             {['Premiere Pro', 'After Effects', 'Photoshop', 'Illustrator'].map(tool => (
-              <span key={tool} className="px-4 py-2 rounded-lg bg-sky/10 border border-sky-hover/20 text-xs font-medium text-cocoa/80">
+              <span key={tool} className="px-5 py-2.5 rounded-xl bg-paper border border-border text-xs font-bold text-muted hover:border-cocoa hover:text-cocoa transition-all cursor-default shadow-sm">
                 {tool}
               </span>
             ))}
@@ -524,11 +534,11 @@ const AboutSection = ({ experience, profile }: { experience: Experience | null, 
 
 const ContactSection = ({ profile }: { profile: Profile | null }) => {
   return (
-    <section id="contact" className="py-32 bg-white/30 text-cocoa">
-      <div className="max-w-3xl mx-auto px-6 text-center">
-        <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-cocoa/80 mb-8">{profile?.contact_title || 'Contact'}</h2>
-        <h3 className="text-5xl md:text-7xl font-serif italic mb-8 tracking-tighter">{profile?.contact_subtitle || "Let's collaborate."}</h3>
-        <p className="text-lg text-ink/90 mb-12 leading-relaxed">
+    <section id="contact" className="py-32 bg-paper text-ink">
+      <div className="max-w-4xl mx-auto px-6 text-center">
+        <h2 className="text-xs font-bold tracking-[0.3em] uppercase text-muted mb-8">{profile?.contact_title || 'Contact'}</h2>
+        <h3 className="text-5xl md:text-7xl font-serif italic mb-10 tracking-tighter text-cocoa">{profile?.contact_subtitle || "Let's collaborate."}</h3>
+        <p className="text-lg md:text-xl text-muted mb-16 leading-relaxed font-medium">
           프로젝트 협업, 외주, 채용 제안 모두 편하게 연락 주세요.<br />
           확인 후 가능한 빠르게 답변드립니다.
         </p>
@@ -536,7 +546,7 @@ const ContactSection = ({ profile }: { profile: Profile | null }) => {
         <div className="flex flex-col md:flex-row items-center justify-center gap-6">
           <a 
             href={`mailto:${profile?.contact_email || 'gns8365@naver.com'}`} 
-            className="w-full md:w-auto px-10 py-5 rounded-2xl bg-cocoa text-white hover:bg-sky-hover transition-all flex items-center justify-center gap-3 font-bold shadow-xl shadow-cocoa/10"
+            className="w-full md:w-auto px-10 py-5 rounded-2xl bg-cocoa text-paper hover:bg-cocoa-hover transition-all flex items-center justify-center gap-3 font-bold shadow-xl shadow-cocoa/20"
           >
             <Mail size={20} /> {profile?.contact_email || 'gns8365@naver.com'}
           </a>
@@ -544,7 +554,7 @@ const ContactSection = ({ profile }: { profile: Profile | null }) => {
             href={profile?.contact_kakao || "https://open.kakao.com/o/sribRuxh"} 
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full md:w-auto px-10 py-5 rounded-2xl bg-[#FEE500] text-cocoa hover:bg-[#F7E600] transition-all flex items-center justify-center gap-3 font-bold shadow-xl shadow-yellow-400/20"
+            className="w-full md:w-auto px-10 py-5 rounded-2xl border-2 border-cocoa text-cocoa hover:bg-cocoa/5 transition-all flex items-center justify-center gap-3 font-bold"
           >
             카카오 1:1 문의
           </a>
@@ -1477,6 +1487,12 @@ export default function App() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (profile?.site_name) {
+      document.title = `${profile.site_name} | 비디오 에디터 포트폴리오`;
+    }
+  }, [profile]);
 
   return (
     <div className="selection:bg-sky selection:text-cocoa">
