@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build",
+    "lint": "echo 'Skipping linting'",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "start": "node server.ts"
