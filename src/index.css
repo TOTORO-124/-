@@ -5,26 +5,80 @@
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
   --font-serif: "Pretendard Variable", Pretendard, sans-serif;
 
-  --color-cocoa: #5B3A29;      /* Primary Brown */
-  --color-cocoa-hover: #4A2F22; /* Darker Brown for hover */
-  --color-sky: #5B3A29;        /* Mapping sky to cocoa for point consistency */
-  --color-sky-hover: #4A2F22;
-  --color-paper: #F8F6F2;      /* Off White */
-  --color-beige: #F3ECE2;      /* Card/Section Beige */
-  --color-ink: #1C1C1C;        /* Soft Black */
-  --color-muted: #6C6C6C;      /* Muted Text Gray */
-  --color-border: #D8D2C8;     /* Border Gray */
-  --color-surface: #FFFFFF;
+  --color-cocoa: var(--cocoa);
+  --color-cocoa-hover: var(--cocoa-hover);
+  --color-sky: var(--sky);
+  --color-sky-hover: var(--sky-hover);
+  --color-paper: var(--paper);
+  --color-beige: var(--beige);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-surface: var(--surface);
+}
+
+:root {
+  --paper: #110E0D;
+  --beige: #171311;
+  --ink: #F4EDE6;
+  --muted: #B7A99A;
+  --border: #3D322C;
+  --surface: #211A17;
+  --cocoa: #D2A184;
+  --cocoa-hover: #E0B092;
+  --sky: #110E0D;
+  --sky-hover: #171311;
+}
+
+:root.light {
+  --paper: #F7F4EF;
+  --beige: #EFE7DC;
+  --ink: #181715;
+  --muted: #5F5953;
+  --border: #D2C6B8;
+  --surface: #FFFCF8;
+  --cocoa: #7A4C33;
+  --cocoa-hover: #5E3826;
+  --sky: #F7F4EF;
+  --sky-hover: #EFE7DC;
 }
 
 @layer base {
   body {
-    @apply bg-paper text-ink font-sans antialiased;
+    @apply bg-paper text-ink font-sans antialiased transition-colors duration-300;
   }
 }
 
 .glass {
-  @apply bg-white/60 backdrop-blur-xl border border-border shadow-sm;
+  @apply bg-white/5 backdrop-blur-xl border border-border shadow-sm;
+}
+
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+  overflow: hidden;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-paper;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
 }
 
 .text-gradient {
