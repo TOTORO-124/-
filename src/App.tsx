@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
 import { 
   Play, 
   Mail, 
@@ -77,6 +77,22 @@ const DEFAULT_EXPERIENCE: Partial<Experience> = {
 
 // --- Components ---
 
+const ScrollProgress = () => {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
+  return (
+    <motion.div
+      className="fixed top-0 left-0 right-0 h-1 bg-cocoa origin-left z-[100]"
+      style={{ scaleX }}
+    />
+  );
+};
+
 const ProjectDetailModal = ({ isOpen, project, onClose }: { isOpen: boolean, project: Project | null, onClose: () => void }) => {
   if (!isOpen || !project) return null;
 
@@ -104,10 +120,13 @@ const ProjectDetailModal = ({ isOpen, project, onClose }: { isOpen: boolean, pro
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] bg-paper/95 backdrop-blur-md flex items-center justify-center p-4 md:p-8 overflow-y-auto"
+          className="fixed inset-0 z-[100] bg-paper/95 backdrop-blur-md flex items-start md:items-center justify-center p-4 md:p-8 overflow-y-auto"
           onClick={onClose}
         >
-          <button className="fixed top-6 right-6 text-ink/60 hover:text-cocoa transition-colors z-[110] glass p-2 rounded-full">
+          <button 
+            className="fixed top-6 right-6 text-ink/60 hover:text-cocoa transition-colors z-[110] glass p-2 rounded-full"
+            onClick={onClose}
+          >
             <X size={24} />
           </button>
           
@@ -115,7 +134,7 @@ const ProjectDetailModal = ({ isOpen, project, onClose }: { isOpen: boolean, pro
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            className="w-full max-w-5xl bg-paper rounded-[40px] overflow-hidden shadow-2xl relative border border-border"
+            className="w-full max-w-5xl bg-paper rounded-3xl md:rounded-[40px] overflow-hidden shadow-2xl relative border border-border"
             onClick={e => e.stopPropagation()}
           >
             <div className="aspect-video w-full bg-black">
@@ -391,7 +410,7 @@ const FeaturedSection = ({ projects, profile, onProjectClick }: { projects: Proj
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex items-end justify-between mb-24"
+          className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-8"
         >
           <div>
             <h2 className="text-xs font-black tracking-[0.5em] uppercase text-cocoa mb-6">{profile?.featured_title || 'Featured Projects'}</h2>
@@ -465,6 +484,7 @@ const FeaturedSection = ({ projects, profile, onProjectClick }: { projects: Proj
 
 const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], profile: Profile | null, onProjectClick: (p: Project) => void }) => {
   const [filter, setFilter] = useState('All');
+  const [displayCount, setDisplayCount] = useState(6);
   const scrollRef = useRef<HTMLDivElement>(null);
   const categories = [
     {v: 'All', l: '전체'},
@@ -479,15 +499,8 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
     ? projects 
     : projects.filter(p => p.category === filter);
 
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollRef.current) {
-      const scrollAmount = 500;
-      scrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      });
-    }
-  };
+  const displayedProjects = filteredProjects.slice(0, displayCount);
+  const hasMore = filteredProjects.length > displayCount;
 
   return (
     <section id="work" className="py-40 bg-paper">
@@ -506,7 +519,10 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
             {categories.map(cat => (
               <button
                 key={cat.v}
-                onClick={() => setFilter(cat.v)}
+                onClick={() => {
+                  setFilter(cat.v);
+                  setDisplayCount(6);
+                }}
                 className={`px-6 py-3 rounded-full text-xs font-black transition-all tracking-tight ${
                   filter === cat.v 
                     ? 'bg-cocoa text-sky shadow-xl shadow-cocoa/20 scale-105' 
@@ -521,7 +537,7 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence mode="popLayout">
-            {filteredProjects.length > 0 ? filteredProjects.map((project) => (
+            {displayedProjects.length > 0 ? displayedProjects.map((project) => (
               <motion.div
                 layout
                 key={project.id}
@@ -555,6 +571,22 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
             )}
           </AnimatePresence>
         </div>
+
+        {hasMore && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            className="mt-20 text-center"
+          >
+            <button 
+              onClick={() => setDisplayCount(prev => prev + 6)}
+              className="group inline-flex items-center gap-4 px-10 py-5 rounded-full bg-ink text-paper font-black text-sm hover:bg-cocoa transition-all shadow-xl shadow-ink/10"
+            >
+              더 많은 작업물 보기
+              <Plus size={18} className="group-hover:rotate-90 transition-transform" />
+            </button>
+          </motion.div>
+        )}
       </div>
     </section>
   );
@@ -1065,22 +1097,22 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
           </div>
         </div>
 
-        <div className="flex gap-4 mb-8">
+        <div className="flex flex-wrap gap-2 md:gap-4 mb-8">
           <button 
             onClick={() => setActiveTab('projects')}
-            className={`px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'projects' ? 'bg-cocoa text-sky shadow-lg shadow-cocoa/20' : 'glass text-ink/60 hover:text-ink'}`}
+            className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold transition-all text-sm md:text-base ${activeTab === 'projects' ? 'bg-cocoa text-sky shadow-lg shadow-cocoa/20' : 'glass text-ink/60 hover:text-ink'}`}
           >
             프로젝트 관리
           </button>
           <button 
             onClick={() => setActiveTab('experience')}
-            className={`px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'experience' ? 'bg-cocoa text-sky shadow-lg shadow-cocoa/20' : 'glass text-ink/60 hover:text-ink'}`}
+            className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold transition-all text-sm md:text-base ${activeTab === 'experience' ? 'bg-cocoa text-sky shadow-lg shadow-cocoa/20' : 'glass text-ink/60 hover:text-ink'}`}
           >
             경력 관리
           </button>
           <button 
             onClick={() => setActiveTab('profile')}
-            className={`px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'profile' ? 'bg-cocoa text-sky shadow-lg shadow-cocoa/20' : 'glass text-ink/60 hover:text-ink'}`}
+            className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold transition-all text-sm md:text-base ${activeTab === 'profile' ? 'bg-cocoa text-sky shadow-lg shadow-cocoa/20' : 'glass text-ink/60 hover:text-ink'}`}
           >
             프로필 관리
           </button>
@@ -1097,9 +1129,9 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
 
             <div className="grid gap-4">
               {projects.map((p, idx) => (
-                <div key={p.id} className={`glass p-6 rounded-2xl flex items-center justify-between transition-opacity ${p.is_hidden ? 'opacity-50' : ''}`}>
+                <div key={p.id} className={`glass p-4 md:p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 transition-opacity ${p.is_hidden ? 'opacity-50' : ''}`}>
                   <div className="flex items-center gap-4">
-                    <div className="relative">
+                    <div className="relative shrink-0">
                       {p.thumbnail && <img src={p.thumbnail} className="w-20 h-12 object-cover rounded-lg" />}
                       {p.is_hidden && (
                         <div className="absolute inset-0 bg-paper/60 flex items-center justify-center rounded-lg">
@@ -1107,12 +1139,12 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
                         </div>
                       )}
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-ink">{p.title}</h4>
-                        {p.is_hidden && <span className="text-[10px] px-1.5 py-0.5 bg-ink/10 text-ink/60 rounded font-bold">숨김</span>}
+                        <h4 className="font-bold text-ink truncate">{p.title}</h4>
+                        {p.is_hidden && <span className="shrink-0 text-[10px] px-1.5 py-0.5 bg-ink/10 text-ink/60 rounded font-bold">숨김</span>}
                       </div>
-                      <p className="text-xs text-ink/40">
+                      <p className="text-xs text-ink/40 truncate">
                         {{
                           'Corporate': '기업 영상',
                           'Education': '교육/강의',
@@ -1123,19 +1155,19 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex flex-col gap-1 mr-4">
+                  <div className="flex items-center justify-between md:justify-end gap-2 border-t md:border-t-0 pt-3 md:pt-0">
+                    <div className="flex items-center gap-1 mr-2">
                       <button 
                         disabled={idx === 0}
                         onClick={() => moveProject(idx, 'up')}
-                        className="p-1 hover:bg-ink/10 rounded disabled:opacity-20 text-ink"
+                        className="p-2 hover:bg-ink/10 rounded disabled:opacity-20 text-ink"
                       >
                         <ChevronUp size={16} />
                       </button>
                       <button 
                         disabled={idx === projects.length - 1}
                         onClick={() => moveProject(idx, 'down')}
-                        className="p-1 hover:bg-ink/10 rounded disabled:opacity-20 text-ink"
+                        className="p-2 hover:bg-ink/10 rounded disabled:opacity-20 text-ink"
                       >
                         <ChevronDown size={16} />
                       </button>
@@ -1827,7 +1859,8 @@ export default function App() {
   }, [profile]);
 
   return (
-    <div className="selection:bg-cocoa selection:text-sky">
+    <div className={`min-h-screen font-sans transition-colors duration-500 ${isDarkMode ? 'dark' : ''} bg-paper text-ink selection:bg-cocoa selection:text-sky`}>
+      <ScrollProgress />
       <Navbar 
         profile={profile} 
         onAdminClick={() => setIsAdminOpen(true)} 
