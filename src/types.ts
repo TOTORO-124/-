@@ -12,6 +12,10 @@ export interface Project {
   order_index: number;
   category: string;
   notes?: string;
+  work_point?: string;
+  problem_goal?: string;
+  solution_point?: string;
+  tools?: string;
 }
 
 export interface Experience {

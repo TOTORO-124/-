@@ -23,7 +23,13 @@ import {
   Eye,
   EyeOff,
   Sun,
-  Moon
+  Moon,
+  CheckCircle,
+  Zap,
+  Cpu,
+  MessageSquare,
+  Layers,
+  Target
 } from 'lucide-react';
 import { Project, Experience, Profile } from './types';
 import { supabase } from './lib/supabase';
@@ -33,24 +39,24 @@ import { supabase } from './lib/supabase';
 const DEFAULT_PROFILE: Partial<Profile> = {
   site_name: 'TEDIO',
   hero_label: 'Video Editor & Motion Designer',
-  hero_title: '브랜드 톤은 지키고,',
-  hero_subtitle: '메시지는 더 또렷하게.',
-  hero_description: '기업·교육·인터뷰 중심의 영상 편집/모션 작업을 합니다.\n목적에 맞는 구조, 자막 가독성, 리듬감 있는 편집에 강합니다.',
+  hero_title: '브랜드의 본질을 담는 구조와 리듬.',
+  hero_subtitle: '메시지를 정확하게 전달하는 영상 제작자.',
+  hero_description: '단순한 컷 편집을 넘어, 정보의 우선순위를 정하고 시청자의 몰입을 설계합니다.\n구조와 리듬을 통해 브랜드의 메시지를 가장 또렷하게 전달합니다.',
   about_strengths_title: 'About & Strengths',
   about_subtitle: '영상의 목적과 톤을 먼저 이해하고, \n구조와 리듬으로 전달력을 높이는 편집을 지향합니다.',
   about_text: '기업/교육/인터뷰 기반 작업을 중심으로, 깔끔하고 안정적인 결과물을 만듭니다. \n단순한 컷 편집을 넘어 시청자가 끝까지 몰입할 수 있는 흐름을 설계합니다.',
   strength1_title: '구조 설계',
-  strength1_desc: '흐름이 자연스럽고 이해가 쉬운 편집',
+  strength1_desc: '정보의 우선순위를 파악하여 흐름이 자연스러운 편집',
   strength2_title: '자막 가독성',
-  strength2_desc: '화면을 해치지 않는 자막 배치와 리듬',
+  strength2_desc: '메시지 전달력을 극대화하는 자막 배치와 리듬 조절',
   strength3_title: '마감 퀄리티',
-  strength3_desc: '사운드 정리, 템포, 전체 톤 통일',
+  strength3_desc: '브랜드 톤앤매너를 유지하는 정교한 최종 조율',
   featured_title: 'Featured Projects',
   featured_subtitle: '대표작 3선',
   work_title: 'Work Archive',
   work_subtitle: '전체 작업 모음',
   contact_title: 'Contact',
-  contact_subtitle: "Let's collaborate.",
+  contact_subtitle: "귀사의 메시지를 정확하게 구현합니다.",
   contact_email: 'gns8365@naver.com',
   contact_kakao: 'https://open.kakao.com/o/sribRuxh',
   exp_title: 'Experience Snapshot',
@@ -340,9 +346,19 @@ const FeaturedSection = ({ projects, profile, onProjectClick }: { projects: Proj
                   <span className="shrink-0 text-[10px] font-black px-3 py-1 rounded-full bg-cocoa/10 text-cocoa border border-cocoa/20 uppercase tracking-widest">{project.type}</span>
                 </div>
                 <p className="text-muted text-base leading-relaxed font-medium line-clamp-2">{project.description}</p>
+                
+                {project.work_point && (
+                  <div className="flex gap-3 items-start">
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-cocoa shrink-0" />
+                    <p className="text-sm font-bold text-ink leading-relaxed">
+                      {project.work_point}
+                    </p>
+                  </div>
+                )}
+
                 {project.notes && (
                   <div className="p-5 rounded-2xl bg-surface border border-border text-sm text-muted/80 leading-relaxed shadow-inner">
-                    " {project.notes} "
+                    {project.notes}
                   </div>
                 )}
                 <div className="pt-5 border-t border-border/60 flex items-center justify-between">
@@ -421,70 +437,41 @@ const WorkGrid = ({ projects, profile, onProjectClick }: { projects: Project[], 
           </div>
         </motion.div>
 
-        <div className="relative group/scroll">
-          {/* Navigation Buttons */}
-          <button 
-            onClick={() => scroll('left')}
-            className="absolute -left-6 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full glass flex items-center justify-center opacity-0 group-hover/scroll:opacity-100 transition-all hover:bg-cocoa hover:text-sky shadow-2xl"
-          >
-            <ChevronLeft size={28} />
-          </button>
-          <button 
-            onClick={() => scroll('right')}
-            className="absolute -right-6 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full glass flex items-center justify-center opacity-0 group-hover/scroll:opacity-100 transition-all hover:bg-cocoa hover:text-sky shadow-2xl"
-          >
-            <ChevronRight size={28} />
-          </button>
-
-          <div 
-            ref={scrollRef}
-            className="flex gap-6 overflow-x-auto pb-12 scrollbar-hide snap-x snap-mandatory"
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredProjects.length > 0 ? filteredProjects.map((project) => (
-                <motion.div
-                  layout
-                  key={project.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  onClick={() => onProjectClick(project)}
-                  className="group relative aspect-video h-[240px] md:h-[300px] shrink-0 rounded-2xl overflow-hidden border border-border cursor-pointer snap-start shadow-lg hover:shadow-2xl transition-all duration-500"
-                >
-                  <img 
-                    src={project.thumbnail || "https://picsum.photos/seed/work/800/450"} 
-                    alt={project.title} 
-                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-paper via-paper/60 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 p-8 flex flex-col justify-end backdrop-blur-[2px]">
-                    <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                      <p className="text-[10px] font-black text-cocoa mb-2 uppercase tracking-[0.3em]">{project.type}</p>
-                      <h4 className="text-xl font-black mb-3 text-ink leading-tight">{project.title}</h4>
-                      <div className="flex items-center gap-2 text-muted">
-                        <p className="text-xs font-bold">{project.role}</p>
-                        <div className="w-1 h-1 rounded-full bg-cocoa" />
-                        <p className="text-[10px] font-black uppercase tracking-widest">{project.category}</p>
-                      </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <AnimatePresence mode="popLayout">
+            {filteredProjects.length > 0 ? filteredProjects.map((project) => (
+              <motion.div
+                layout
+                key={project.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                onClick={() => onProjectClick(project)}
+                className="group relative aspect-video rounded-2xl overflow-hidden border border-border cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
+              >
+                <img 
+                  src={project.thumbnail || "https://picsum.photos/seed/work/800/450"} 
+                  alt={project.title} 
+                  className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-paper via-paper/60 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 p-8 flex flex-col justify-end backdrop-blur-[2px]">
+                  <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                    <p className="text-[10px] font-black text-cocoa mb-2 uppercase tracking-[0.3em]">{project.type}</p>
+                    <h4 className="text-xl font-black mb-3 text-ink leading-tight">{project.title}</h4>
+                    <div className="flex items-center gap-2 text-muted">
+                      <p className="text-xs font-bold">{project.role}</p>
+                      <div className="w-1 h-1 rounded-full bg-cocoa" />
+                      <p className="text-[10px] font-black uppercase tracking-widest">{project.category}</p>
                     </div>
                   </div>
-                </motion.div>
-              )) : (
-                <div className="w-full py-32 text-center glass rounded-[40px] flex-1 flex items-center justify-center border-border">
-                  <p className="text-muted text-2xl">해당 카테고리의 영상이 없습니다.</p>
                 </div>
-              )}
-            </AnimatePresence>
-          </div>
-          
-          {/* Scroll Indicators */}
-          <div className="absolute -bottom-4 left-0 w-full h-1.5 bg-border/30 rounded-full overflow-hidden">
-            <motion.div 
-              className="h-full bg-cocoa rounded-full"
-              initial={{ width: "0%" }}
-              whileInView={{ width: "40%" }}
-              transition={{ duration: 1.5, ease: "easeOut" }}
-            />
-          </div>
+              </motion.div>
+            )) : (
+              <div className="col-span-full py-32 text-center glass rounded-[40px] flex items-center justify-center border-border">
+                <p className="text-muted text-2xl">해당 카테고리의 영상이 없습니다.</p>
+              </div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </section>
@@ -580,6 +567,172 @@ const AboutSection = ({ experience, profile }: { experience: Experience | null, 
               </span>
             ))}
           </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const HowIWork = () => {
+  const steps = [
+    {
+      title: '구조 설계',
+      desc: '영상 제작의 목적을 파악하고, 정보의 우선순위에 따라 전체적인 흐름을 설계합니다.',
+      icon: <Layers className="text-cocoa" size={24} />
+    },
+    {
+      title: '디테일 편집',
+      desc: '자막의 가독성, 오디오 리듬, 브랜드 톤앤매너를 정교하게 조율하여 몰입도를 높입니다.',
+      icon: <Zap className="text-cocoa" size={24} />
+    },
+    {
+      title: '최종 검수',
+      desc: '마감 퀄리티를 위해 프레임 단위로 완성도를 확인하고 최종 결과물을 도출합니다.',
+      icon: <CheckCircle className="text-cocoa" size={24} />
+    }
+  ];
+
+  return (
+    <section className="py-32 bg-paper">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-20">
+          <h2 className="text-xs font-black tracking-[0.5em] uppercase text-cocoa mb-6">How I Work</h2>
+          <p className="text-4xl md:text-5xl font-black text-ink tracking-tighter">신뢰를 만드는 작업 프로세스</p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-8">
+          {steps.map((step, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className="glass p-10 rounded-[32px] border-border hover:border-cocoa/30 transition-all group"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-cocoa/5 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                {step.icon}
+              </div>
+              <h3 className="text-2xl font-black text-ink mb-4">{step.title}</h3>
+              <p className="text-muted leading-relaxed font-medium">{step.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const WorkflowAndTools = () => {
+  return (
+    <section className="py-32 bg-beige">
+      <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-xs font-black tracking-[0.5em] uppercase text-cocoa mb-6">Workflow & Tools</h2>
+          <p className="text-4xl md:text-5xl font-black text-ink tracking-tighter mb-8 leading-tight">
+            최적의 결과물을 위해<br />도구를 유연하게 활용합니다.
+          </p>
+          <div className="space-y-6 text-muted font-medium leading-relaxed">
+            <p>
+              레퍼런스 탐색 및 시안 정리 단계에서 AI 기반 도구를 보조적으로 활용하여, 본질적인 편집 판단과 창의적인 고민에 더 많은 시간을 투자합니다.
+            </p>
+            <p>
+              반복적인 작업을 줄이고 워크플로우를 개선함으로써, 더 안정적인 마감 퀄리티와 효율적인 제작 환경을 구축합니다. 기술은 효율을 돕지만, 최종적인 완성도는 편집자의 감각으로 결정합니다.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3 mt-10">
+            {['Premiere Pro', 'After Effects', 'Photoshop', 'Illustrator', 'AI Workflow'].map(tool => (
+              <span key={tool} className="px-5 py-2.5 rounded-xl bg-cocoa/5 border border-cocoa/10 text-xs font-black text-cocoa">
+                {tool}
+              </span>
+            ))}
+          </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="relative"
+        >
+          <div className="glass p-10 rounded-[40px] border-border relative z-10">
+            <div className="space-y-8">
+              <div className="flex gap-6 items-start">
+                <div className="w-12 h-12 rounded-xl bg-cocoa/10 flex items-center justify-center shrink-0">
+                  <Cpu className="text-cocoa" size={24} />
+                </div>
+                <div>
+                  <h4 className="text-lg font-black text-ink mb-2">AI Assisted Workflow</h4>
+                  <p className="text-sm text-muted leading-relaxed">AI를 활용한 빠른 시안 작업 및 레퍼런스 분석으로 기획의 정확도를 높입니다.</p>
+                </div>
+              </div>
+              <div className="flex gap-6 items-start">
+                <div className="w-12 h-12 rounded-xl bg-cocoa/10 flex items-center justify-center shrink-0">
+                  <Target className="text-cocoa" size={24} />
+                </div>
+                <div>
+                  <h4 className="text-lg font-black text-ink mb-2">Focus on Essence</h4>
+                  <p className="text-sm text-muted leading-relaxed">단순 반복 업무를 자동화하고, 영상의 메시지와 리듬감 등 본질적인 퀄리티에 집중합니다.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-cocoa/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-cocoa/10 rounded-full blur-3xl" />
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+const Testimonials = () => {
+  const reviews = [
+    {
+      content: "복잡한 기획안을 드려도 영상의 핵심을 정확히 짚어 구조화해주시는 분입니다. 마감 기한 준수는 물론이고 브랜드 톤을 유지하는 감각이 탁월합니다.",
+      author: "브랜드 마케팅 팀장",
+      company: "A사"
+    },
+    {
+      content: "자막 가독성과 편집 리듬이 정말 좋습니다. 교육 콘텐츠 특성상 정보 전달이 중요한데, 시청자들이 끝까지 몰입할 수 있는 흐름을 만들어주셨어요.",
+      author: "콘텐츠 PD",
+      company: "B 교육 플랫폼"
+    }
+  ];
+
+  return (
+    <section className="py-32 bg-paper">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-20">
+          <h2 className="text-xs font-black tracking-[0.5em] uppercase text-cocoa mb-6">Testimonials</h2>
+          <p className="text-4xl md:text-5xl font-black text-ink tracking-tighter">함께한 파트너들의 신뢰</p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-8">
+          {reviews.map((review, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className="glass p-12 rounded-[40px] border-border relative"
+            >
+              <MessageSquare className="text-cocoa/20 absolute top-10 right-10" size={48} />
+              <p className="text-xl font-medium text-ink leading-relaxed mb-10 relative z-10">
+                "{review.content}"
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-cocoa/10 flex items-center justify-center text-cocoa font-black">
+                  {review.company[0]}
+                </div>
+                <div>
+                  <p className="font-black text-ink">{review.author}</p>
+                  <p className="text-xs text-muted font-bold uppercase tracking-widest">{review.company}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
@@ -1210,9 +1363,29 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
                   <label className="block text-xs font-bold text-ink/60 mb-2 uppercase">설명</label>
                   <textarea value={editingProject.description || ''} onChange={e => setEditingProject({...editingProject, description: e.target.value})} className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 h-24 font-medium text-ink" />
                 </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs font-bold text-ink/60 mb-2 uppercase">작업 포인트 (한 줄 해결 포인트)</label>
+                    <textarea value={editingProject.work_point || ''} onChange={e => setEditingProject({...editingProject, work_point: e.target.value})} className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 h-20 font-medium text-ink" placeholder="예: 자막 구조화와 리듬 조절로 가독성을 80% 개선했습니다." />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-ink/60 mb-2 uppercase">사용 도구 (AI 포함)</label>
+                    <input value={editingProject.tools || ''} onChange={e => setEditingProject({...editingProject, tools: e.target.value})} className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 font-medium text-ink" placeholder="예: Premiere, After Effects, AI Voice" />
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs font-bold text-ink/60 mb-2 uppercase">문제 및 목표 (Problem/Goal)</label>
+                    <textarea value={editingProject.problem_goal || ''} onChange={e => setEditingProject({...editingProject, problem_goal: e.target.value})} className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 h-24 font-medium text-ink" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-ink/60 mb-2 uppercase">해결 방법 (Solution/Point)</label>
+                    <textarea value={editingProject.solution_point || ''} onChange={e => setEditingProject({...editingProject, solution_point: e.target.value})} className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 h-24 font-medium text-ink" />
+                  </div>
+                </div>
                 <div>
-                  <label className="block text-xs font-bold text-ink/60 mb-2 uppercase">작업 노트 (인사이트)</label>
-                  <textarea value={editingProject.notes || ''} onChange={e => setEditingProject({...editingProject, notes: e.target.value})} className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 h-20 font-medium text-ink" placeholder="이 영상에서 가장 신경 쓴 부분이나 해결한 문제를 적어주세요." />
+                  <label className="block text-xs font-bold text-ink/60 mb-2 uppercase">작업 노트 (기타 인사이트)</label>
+                  <textarea value={editingProject.notes || ''} onChange={e => setEditingProject({...editingProject, notes: e.target.value})} className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 h-20 font-medium text-ink" placeholder="이 영상에서 추가적으로 신경 쓴 부분이나 해결한 문제를 적어주세요." />
                 </div>
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-3">
@@ -1612,7 +1785,10 @@ export default function App() {
           profile={profile}
           onProjectClick={(p) => setSelectedVideoUrl(p.link)} 
         />
+        <HowIWork />
+        <WorkflowAndTools />
         <AboutSection experience={experience} profile={profile} />
+        <Testimonials />
         <ContactSection profile={profile} />
       </main>
 
