@@ -77,8 +77,8 @@ const DEFAULT_EXPERIENCE: Partial<Experience> = {
 
 // --- Components ---
 
-const VideoModal = ({ isOpen, videoUrl, onClose }: { isOpen: boolean, videoUrl: string, onClose: () => void }) => {
-  if (!isOpen) return null;
+const ProjectDetailModal = ({ isOpen, project, onClose }: { isOpen: boolean, project: Project | null, onClose: () => void }) => {
+  if (!isOpen || !project) return null;
 
   const getEmbedUrl = (url: string) => {
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
@@ -104,25 +104,107 @@ const VideoModal = ({ isOpen, videoUrl, onClose }: { isOpen: boolean, videoUrl: 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] bg-paper/90 backdrop-blur-sm flex items-center justify-center p-4 md:p-12"
+          className="fixed inset-0 z-[100] bg-paper/95 backdrop-blur-md flex items-center justify-center p-4 md:p-8 overflow-y-auto"
           onClick={onClose}
         >
-          <button className="absolute top-8 right-8 text-ink/60 hover:text-cocoa transition-colors z-[110]">
-            <X size={32} />
+          <button className="fixed top-6 right-6 text-ink/60 hover:text-cocoa transition-colors z-[110] glass p-2 rounded-full">
+            <X size={24} />
           </button>
+          
           <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="w-full max-w-6xl aspect-video glass rounded-3xl overflow-hidden shadow-2xl relative"
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            className="w-full max-w-5xl bg-paper rounded-[40px] overflow-hidden shadow-2xl relative border border-border"
             onClick={e => e.stopPropagation()}
           >
-            <iframe 
-              src={getEmbedUrl(videoUrl)}
-              className="w-full h-full"
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-            />
+            <div className="aspect-video w-full bg-black">
+              <iframe 
+                src={getEmbedUrl(project.link)}
+                className="w-full h-full"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+            
+            <div className="p-8 md:p-12 space-y-12">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-border">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="px-3 py-1 rounded-full bg-cocoa/10 text-cocoa text-[10px] font-black uppercase tracking-widest border border-cocoa/20">
+                      {project.category}
+                    </span>
+                    <span className="px-3 py-1 rounded-full bg-ink/5 text-ink/40 text-[10px] font-black uppercase tracking-widest border border-ink/10">
+                      {project.type}
+                    </span>
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-black text-ink tracking-tighter">{project.title}</h2>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-muted font-black mb-1">My Role</p>
+                  <p className="text-lg text-ink font-black">{project.role}</p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-12">
+                <div className="space-y-8">
+                  {project.problem_goal && (
+                    <div>
+                      <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-cocoa mb-4">
+                        <Target size={14} /> Problem & Goal
+                      </h4>
+                      <p className="text-muted leading-relaxed font-medium whitespace-pre-line">
+                        {project.problem_goal}
+                      </p>
+                    </div>
+                  )}
+                  {project.solution_point && (
+                    <div>
+                      <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-cocoa mb-4">
+                        <Zap size={14} /> Solution & Point
+                      </h4>
+                      <p className="text-muted leading-relaxed font-medium whitespace-pre-line">
+                        {project.solution_point}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-8">
+                  <div>
+                    <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-cocoa mb-4">
+                      <Layers size={14} /> Description
+                    </h4>
+                    <p className="text-muted leading-relaxed font-medium">
+                      {project.description}
+                    </p>
+                  </div>
+                  {project.tools && (
+                    <div>
+                      <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-cocoa mb-4">
+                        <Cpu size={14} /> Tools Used
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {project.tools.split(',').map(tool => (
+                          <span key={tool} className="px-3 py-1.5 rounded-lg bg-ink/5 border border-ink/10 text-[10px] font-bold text-ink/60">
+                            {tool.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {project.notes && (
+                <div className="p-8 rounded-3xl bg-beige border border-cocoa/10">
+                  <p className="text-sm font-bold text-cocoa mb-2 uppercase tracking-widest">Editor's Note</p>
+                  <p className="text-ink/80 leading-relaxed font-medium italic">
+                    "{project.notes}"
+                  </p>
+                </div>
+              )}
+            </div>
           </motion.div>
         </motion.div>
       )}
@@ -148,8 +230,8 @@ const Navbar = ({ profile, onAdminClick, isDarkMode, onThemeToggle }: {
   const menuItems = [
     { name: 'Featured', href: '#featured' },
     { name: 'Work', href: '#work' },
+    { name: 'Process', href: '#process' },
     { name: 'About', href: '#about' },
-    { name: 'Experience', href: '#experience' },
     { name: 'Contact', href: '#contact' },
   ];
 
@@ -487,7 +569,7 @@ const AboutSection = ({ experience, profile }: { experience: Experience | null, 
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-xs font-bold tracking-[0.3em] uppercase text-ink/40 mb-8">{profile?.about_strengths_title || 'About & Strengths'}</h2>
+          <h2 className="text-xs font-bold tracking-[0.3em] uppercase text-ink/40 mb-8">{profile?.about_strengths_title || 'About & Experience'}</h2>
           <div className="space-y-10">
             <p className="text-2xl md:text-3xl font-bold leading-tight text-ink whitespace-pre-line">
               {profile?.about_subtitle || '영상의 목적과 톤을 먼저 이해하고, \n구조와 리듬으로 전달력을 높이는 편집을 지향합니다.'}
@@ -495,31 +577,6 @@ const AboutSection = ({ experience, profile }: { experience: Experience | null, 
             <p className="text-base md:text-lg text-ink/60 leading-relaxed whitespace-pre-line font-medium border-l-4 border-ink/20 pl-6 max-w-2xl">
               {profile?.about_text || '기업/교육/인터뷰 기반 작업을 중심으로, 깔끔하고 안정적인 결과물을 만듭니다. \n단순한 컷 편집을 넘어 시청자가 끝까지 몰입할 수 있는 흐름을 설계합니다.'}
             </p>
-            
-            <div className="grid grid-cols-1 gap-8 pt-6">
-              {[
-                { title: profile?.strength1_title || '구조 설계', desc: profile?.strength1_desc || '흐름이 자연스럽고 이해가 쉬운 편집' },
-                { title: profile?.strength2_title || '자막 가독성', desc: profile?.strength2_desc || '화면을 해치지 않는 자막 배치와 리듬' },
-                { title: profile?.strength3_title || '마감 퀄리티', desc: profile?.strength3_desc || '사운드 정리, 템포, 전체 톤 통일' }
-              ].map((strength, i) => (
-                <motion.div 
-                  key={i} 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="flex gap-6 group"
-                >
-                  <div className="w-14 h-14 shrink-0 rounded-2xl bg-cocoa/5 border border-cocoa/10 flex items-center justify-center text-cocoa font-bold text-xl group-hover:bg-cocoa group-hover:text-sky transition-all duration-500 shadow-sm">
-                    0{i + 1}
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-bold text-ink mb-1 group-hover:text-ink/80 transition-colors">{strength.title}</h4>
-                    <p className="text-ink/40 font-medium leading-relaxed">{strength.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
           </div>
         </motion.div>
 
@@ -559,14 +616,6 @@ const AboutSection = ({ experience, profile }: { experience: Experience | null, 
               <p className="text-ink/20">Loading experience data...</p>
             )}
           </motion.div>
-
-          <div className="flex flex-wrap gap-3">
-            {['Premiere Pro', 'After Effects', 'Photoshop', 'Illustrator'].map(tool => (
-              <span key={tool} className="px-5 py-2.5 rounded-xl bg-ink/5 border border-ink/10 text-xs font-bold text-ink/40 hover:border-ink/30 hover:text-ink transition-all cursor-default shadow-sm">
-                {tool}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
     </section>
@@ -593,7 +642,7 @@ const HowIWork = () => {
   ];
 
   return (
-    <section className="py-32 bg-paper">
+    <section id="process" className="py-32 bg-beige">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-20">
           <h2 className="text-xs font-black tracking-[0.5em] uppercase text-cocoa mb-6">How I Work</h2>
@@ -624,7 +673,7 @@ const HowIWork = () => {
 
 const WorkflowAndTools = () => {
   return (
-    <section className="py-32 bg-beige">
+    <section className="py-32 bg-paper">
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
         <motion.div
           initial={{ opacity: 0, x: -30 }}
@@ -741,7 +790,7 @@ const Testimonials = () => {
 
 const ContactSection = ({ profile }: { profile: Profile | null }) => {
   return (
-    <section id="contact" className="py-48 bg-paper text-ink relative overflow-hidden">
+    <section id="contact" className="py-48 bg-beige text-ink relative overflow-hidden">
       {/* Decorative Elements */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-32 bg-gradient-to-b from-transparent via-cocoa/50 to-transparent" />
       
@@ -1707,7 +1756,7 @@ export default function App() {
   const [experience, setExperience] = useState<Experience | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
 
   const fetchData = async () => {
@@ -1733,13 +1782,30 @@ export default function App() {
     
     // Load theme preference
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-      setIsDarkMode(false);
-      document.documentElement.classList.add('light');
-    } else {
-      setIsDarkMode(true);
-      document.documentElement.classList.remove('light');
-    }
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const applyTheme = (isDark: boolean) => {
+      setIsDarkMode(isDark);
+      if (isDark) {
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.add('light');
+      }
+    };
+
+    // Initial apply
+    const initialDark = savedTheme ? savedTheme === 'dark' : mediaQuery.matches;
+    applyTheme(initialDark);
+
+    // Listen for system changes
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem('theme')) {
+        applyTheme(e.matches);
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
   const toggleTheme = () => {
@@ -1773,17 +1839,17 @@ export default function App() {
         <Hero 
           mainProject={projects.find(p => p.is_main && !p.is_hidden) || null} 
           profile={profile}
-          onProjectClick={(p) => setSelectedVideoUrl(p.link)} 
+          onProjectClick={(p) => setSelectedProject(p)} 
         />
         <FeaturedSection 
           projects={projects.filter(p => p.is_featured && !p.is_hidden)} 
           profile={profile}
-          onProjectClick={(p) => setSelectedVideoUrl(p.link)} 
+          onProjectClick={(p) => setSelectedProject(p)} 
         />
         <WorkGrid 
           projects={projects.filter(p => !p.is_hidden)} 
           profile={profile}
-          onProjectClick={(p) => setSelectedVideoUrl(p.link)} 
+          onProjectClick={(p) => setSelectedProject(p)} 
         />
         <HowIWork />
         <WorkflowAndTools />
@@ -1814,11 +1880,11 @@ export default function App() {
             onClose={() => setIsAdminOpen(false)} 
           />
         )}
-        {selectedVideoUrl && (
-          <VideoModal 
-            isOpen={!!selectedVideoUrl} 
-            videoUrl={selectedVideoUrl} 
-            onClose={() => setSelectedVideoUrl(null)} 
+        {selectedProject && (
+          <ProjectDetailModal 
+            isOpen={!!selectedProject} 
+            project={selectedProject} 
+            onClose={() => setSelectedProject(null)} 
           />
         )}
       </AnimatePresence>
