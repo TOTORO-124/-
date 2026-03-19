@@ -32,47 +32,46 @@ import {
   Target
 } from 'lucide-react';
 import { Project, Experience, Profile } from './types';
-import { supabase } from './lib/supabase';
 
 // --- Constants ---
 
 const DEFAULT_PROFILE: Partial<Profile> = {
   site_name: 'TEDIO',
-  hero_label: 'Video Editor & Motion Designer',
-  hero_title: '브랜드의 본질을 담는 구조와 리듬.',
-  hero_subtitle: '메시지를 정확하게 전달하는 영상 제작자.',
-  hero_description: '단순한 컷 편집을 넘어, 정보의 우선순위를 정하고 시청자의 몰입을 설계합니다.\n구조와 리듬을 통해 브랜드의 메시지를 가장 또렷하게 전달합니다.',
+  hero_label: 'Video Producer / PD',
+  hero_title: '기획부터 납품까지,',
+  hero_subtitle: '브랜드의 본질을 영상으로 구현합니다.',
+  hero_description: '단순한 편집을 넘어, 메시지의 구조를 설계하고 시청자의 몰입을 연출합니다.\n기획 → 구성 → 연출 → 편집 → 납품 전 과정을 연결하는 비디오 프로듀서 TEDIO입니다.',
   about_strengths_title: 'About & Strengths',
-  about_subtitle: '영상의 목적과 톤을 먼저 이해하고, \n구조와 리듬으로 전달력을 높이는 편집을 지향합니다.',
-  about_text: '기업/교육/인터뷰 기반 작업을 중심으로, 깔끔하고 안정적인 결과물을 만듭니다. \n단순한 컷 편집을 넘어 시청자가 끝까지 몰입할 수 있는 흐름을 설계합니다.',
-  strength1_title: '구조 설계',
-  strength1_desc: '정보의 우선순위를 파악하여 흐름이 자연스러운 편집',
-  strength2_title: '자막 가독성',
-  strength2_desc: '메시지 전달력을 극대화하는 자막 배치와 리듬 조절',
-  strength3_title: '마감 퀄리티',
-  strength3_desc: '브랜드 톤앤매너를 유지하는 정교한 최종 조율',
+  about_subtitle: '브랜드의 메시지를 가장 또렷하게\n전달하는 비디오 프로듀서.',
+  about_text: '영상 제작자로서 저는 단순한 컷 편집을 넘어, 브랜드의 가치를 시각적으로 극대화하는 작업을 지향합니다. 기획 단계부터 참여하여 최종 결과물의 톤앤매너를 일관되게 유지합니다.',
+  strength1_title: '기획 및 구성',
+  strength1_desc: '정보의 우선순위를 파악하여 흐름이 자연스러운 영상 설계',
+  strength2_title: '연출 및 편집',
+  strength2_desc: '브랜드 톤을 유지하며 몰입감을 극대화하는 시각적 연출',
+  strength3_title: 'AI 워크플로우',
+  strength3_desc: 'AI 도구를 활용한 효율적인 제작 및 기획의 정확도 향상',
   featured_title: 'Featured Projects',
-  featured_subtitle: '대표작 3선',
+  featured_subtitle: '엄선된 대표작',
   work_title: 'Work Archive',
   work_subtitle: '전체 작업 모음',
   contact_title: 'Contact',
-  contact_subtitle: "귀사의 메시지를 정확하게 구현합니다.",
+  contact_subtitle: "Let's create something great.",
   contact_email: 'gns8365@naver.com',
   contact_kakao: 'https://open.kakao.com/o/sribRuxh',
   exp_title: 'Experience Snapshot',
-  exp_label_field: '주 작업 분야',
-  exp_label_scope: '협업 범위',
-  exp_label_strengths: '강점',
+  exp_label_field: '주 제작 분야',
+  exp_label_scope: '제작 범위',
+  exp_label_strengths: '핵심 역량',
   exp_label_brands: '협력 브랜드'
 };
 
 const DEFAULT_EXPERIENCE: Partial<Experience> = {
-  role: 'Freelance Video Editor',
+  role: 'Video Producer / Director',
   period: '2021 - Present',
-  field: '기업 홍보, 교육 콘텐츠, 인터뷰',
-  scope: '컷 편집, 모션 그래픽, 자막 디자인, 색보정',
-  strengths: '스토리텔링 중심의 편집, 가독성 높은 자막 리듬',
-  brands: '기업 홍보 영상, 유튜브 채널, 온라인 강의 플랫폼 등 다수'
+  field: '기업 홍보, 교육 콘텐츠, 브랜드 필름',
+  scope: '기획, 구성, 연출, 편집, 납품 전 과정',
+  strengths: '메시지 구조화, 브랜드 톤앤매너 유지, AI 워크플로우 효율화',
+  brands: '다양한 기업 및 교육 기관과 협업 중'
 };
 
 // --- Components ---
@@ -160,8 +159,8 @@ const ProjectDetailModal = ({ isOpen, project, onClose }: { isOpen: boolean, pro
                   <h2 className="text-3xl md:text-4xl font-black text-ink tracking-tighter">{project.title}</h2>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-muted font-black mb-1">My Role</p>
-                  <p className="text-lg text-ink font-black">{project.role}</p>
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-muted font-black mb-1">Production Scope</p>
+                  <p className="text-lg text-ink font-black">{project.production_scope || project.role}</p>
                 </div>
               </div>
 
@@ -217,7 +216,7 @@ const ProjectDetailModal = ({ isOpen, project, onClose }: { isOpen: boolean, pro
 
               {project.notes && (
                 <div className="p-8 rounded-3xl bg-beige border border-cocoa/10">
-                  <p className="text-sm font-bold text-cocoa mb-2 uppercase tracking-widest">Editor's Note</p>
+                  <p className="text-sm font-bold text-cocoa mb-2 uppercase tracking-widest">Producer's Note</p>
                   <p className="text-ink/80 leading-relaxed font-medium italic">
                     "{project.notes}"
                   </p>
@@ -464,7 +463,7 @@ const FeaturedSection = ({ projects, profile, onProjectClick }: { projects: Proj
                 )}
                 <div className="pt-5 border-t border-border/60 flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-muted font-black mb-1">My Role</p>
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-muted font-black mb-1">Main Role</p>
                     <p className="text-sm text-ink font-black">{project.role}</p>
                   </div>
                   <ChevronRight size={20} className="text-cocoa opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
@@ -657,18 +656,18 @@ const AboutSection = ({ experience, profile }: { experience: Experience | null, 
 const HowIWork = () => {
   const steps = [
     {
-      title: '구조 설계',
-      desc: '영상 제작의 목적을 파악하고, 정보의 우선순위에 따라 전체적인 흐름을 설계합니다.',
+      title: '기획 및 구성',
+      desc: '영상 제작의 목적을 파악하고, 메시지의 우선순위에 따라 전체적인 구조와 흐름을 설계합니다.',
       icon: <Layers className="text-cocoa" size={24} />
     },
     {
-      title: '디테일 편집',
-      desc: '자막의 가독성, 오디오 리듬, 브랜드 톤앤매너를 정교하게 조율하여 몰입도를 높입니다.',
+      title: '연출 및 편집',
+      desc: '브랜드 톤앤매너를 유지하며 시청자의 몰입을 극대화하는 시각적 연출과 정교한 편집을 진행합니다.',
       icon: <Zap className="text-cocoa" size={24} />
     },
     {
-      title: '최종 검수',
-      desc: '마감 퀄리티를 위해 프레임 단위로 완성도를 확인하고 최종 결과물을 도출합니다.',
+      title: '검수 및 납품',
+      desc: '최종 퀄리티를 위해 프레임 단위로 완성도를 확인하고, 목적에 맞는 최적의 결과물을 도출합니다.',
       icon: <CheckCircle className="text-cocoa" size={24} />
     }
   ];
@@ -718,10 +717,12 @@ const WorkflowAndTools = () => {
           </p>
           <div className="space-y-6 text-muted font-medium leading-relaxed">
             <p>
-              레퍼런스 탐색 및 시안 정리 단계에서 AI 기반 도구를 보조적으로 활용하여, 본질적인 편집 판단과 창의적인 고민에 더 많은 시간을 투자합니다.
+              기획의 의도를 가장 정확하게 구현하기 위해 최신 기술과 도구를 적극적으로 활용합니다. 
+              단순한 도구의 숙련도를 넘어, 프로젝트의 성격에 맞는 최적의 워크플로우를 설계합니다.
             </p>
             <p>
-              반복적인 작업을 줄이고 워크플로우를 개선함으로써, 더 안정적인 마감 퀄리티와 효율적인 제작 환경을 구축합니다. 기술은 효율을 돕지만, 최종적인 완성도는 편집자의 감각으로 결정합니다.
+              특히 AI 기반 도구들을 제작 공정 전반에 도입하여, 반복적인 작업 시간을 단축하고 
+              기획의 디테일과 창의적인 연출에 더 많은 에너지를 집중합니다.
             </p>
           </div>
           <div className="flex flex-wrap gap-3 mt-10">
@@ -896,53 +897,47 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
   }, [profile]);
 
   const handleLogin = async () => {
-    const envPassword = import.meta.env.VITE_ADMIN_PASSWORD;
-    const dbPassword = profile?.admin_password;
-    const adminPassword = dbPassword || envPassword || 'admin';
-    
-    if (password === adminPassword) {
-      setIsLoggedIn(true);
-      setToken('admin-session');
-    } else {
-      alert('비밀번호가 틀렸습니다.');
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsLoggedIn(true);
+        setToken(data.token);
+      } else {
+        alert(data.message || '비밀번호가 틀렸습니다.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('로그인 처리 중 오류가 발생했습니다.');
     }
   };
 
   const saveProject = async (p: Partial<Project>) => {
-    if (!supabase) {
-      alert('Supabase 설정이 필요합니다.');
-      return;
-    }
-    
     setIsSaving(true);
     try {
       if (!p) return;
       
-      const projectToSave = { ...p };
-      if (!projectToSave.id || projectToSave.id === 0) {
-        delete projectToSave.id;
-        // 새 프로젝트인 경우 마지막 순서로 지정
-        if (projectToSave.order_index === undefined) {
-          projectToSave.order_index = projects.length;
-        }
-      }
-
-      if (projectToSave.is_main) {
-        await supabase.from('projects').update({ is_main: false }).neq('id', projectToSave.id || -1);
-      }
-
-      const { error } = await supabase.from('projects').upsert(projectToSave);
+      const method = p.id ? 'PUT' : 'POST';
+      const url = p.id ? `/api/projects/${p.id}` : '/api/projects';
       
-      if (!error) {
-        alert('성공적으로 저장되었습니다.');
-        setEditingProject(null);
-        onUpdate();
-      } else {
-        alert(`저장 실패: ${error.message}`);
-      }
-    } catch (error) {
-      console.error('Save Error:', error);
-      alert('저장 중 오류가 발생했습니다.');
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...p, token })
+      });
+      
+      if (!res.ok) throw new Error('저장 실패');
+      
+      onUpdate();
+      setEditingProject(null);
+      alert('저장되었습니다.');
+    } catch (err) {
+      console.error(err);
+      alert('저장에 실패했습니다.');
     } finally {
       setIsSaving(false);
     }
@@ -956,68 +951,65 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
 
     if (!window.confirm('정말 이 프로젝트를 삭제하시겠습니까?')) return;
     
-    if (!supabase) {
-      alert('Supabase 설정이 필요합니다.');
-      return;
-    }
-
     setIsSaving(true);
     try {
-      const { error } = await supabase.from('projects').delete().eq('id', Number(id));
-      
-      if (!error) {
-        alert('삭제되었습니다.');
-        onUpdate();
-      } else {
-        alert(`삭제 실패: ${error.message}`);
-      }
-    } catch (error) {
-      console.error('Delete Error:', error);
-      alert('삭제 중 오류가 발생했습니다.');
+      const res = await fetch(`/api/projects/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      if (!res.ok) throw new Error('삭제 실패');
+      onUpdate();
+      alert('삭제되었습니다.');
+    } catch (err) {
+      console.error(err);
+      alert('삭제에 실패했습니다.');
     } finally {
       setIsSaving(false);
     }
   };
 
   const saveExperience = async () => {
-    if (!supabase || !editingExp) {
-      alert('데이터가 없거나 Supabase 설정이 필요합니다.');
+    if (!editingExp) {
+      alert('데이터가 없습니다.');
       return;
     }
     setIsSaving(true);
     try {
-      const { id, ...updateData } = editingExp;
-      const { error } = await supabase.from('experience').update(updateData).eq('id', id || 1);
-      if (!error) {
-        alert('경력이 업데이트되었습니다.');
-        onUpdate();
-      } else {
-        alert(`업데이트 실패: ${error.message}`);
-      }
+      const res = await fetch('/api/experience', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...editingExp, token })
+      });
+      if (!res.ok) throw new Error('저장 실패');
+      onUpdate();
+      alert('경력이 업데이트되었습니다.');
     } catch (err) {
       console.error(err);
+      alert('저장에 실패했습니다.');
     } finally {
       setIsSaving(false);
     }
   };
 
   const saveProfile = async () => {
-    if (!supabase || !editingProfile) {
-      alert('데이터가 없거나 Supabase 설정이 필요합니다.');
+    if (!editingProfile) {
+      alert('데이터가 없습니다.');
       return;
     }
     setIsSaving(true);
     try {
-      const { id, ...updateData } = editingProfile;
-      const { error } = await supabase.from('profile').update(updateData).eq('id', id || 1);
-      if (!error) {
-        alert('프로필이 업데이트되었습니다.');
-        onUpdate();
-      } else {
-        alert(`업데이트 실패: ${error.message}`);
-      }
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...editingProfile, token })
+      });
+      if (!res.ok) throw new Error('저장 실패');
+      onUpdate();
+      alert('프로필이 업데이트되었습니다.');
     } catch (err) {
       console.error(err);
+      alert('저장에 실패했습니다.');
     } finally {
       setIsSaving(false);
     }
@@ -1032,18 +1024,21 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
     const p1 = newProjects[index];
     const p2 = newProjects[targetIndex];
     
-    if (!supabase) return;
-
     setIsSaving(true);
     try {
-      const { error: e1 } = await supabase.from('projects').update({ order_index: targetIndex }).eq('id', p1.id);
-      const { error: e2 } = await supabase.from('projects').update({ order_index: index }).eq('id', p2.id);
+      const orders = [
+        { id: p1.id, order_index: targetIndex },
+        { id: p2.id, order_index: index }
+      ];
       
-      if (!e1 && !e2) {
-        onUpdate();
-      } else {
-        console.error('Move Error:', e1 || e2);
-      }
+      const res = await fetch('/api/projects/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orders, token })
+      });
+      
+      if (!res.ok) throw new Error('순서 변경 실패');
+      onUpdate();
     } catch (error) {
       console.error(error);
     } finally {
@@ -1302,8 +1297,12 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
                     <input value={editingProject.type || ''} onChange={e => setEditingProject({...editingProject, type: e.target.value})} className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 font-medium text-ink" placeholder="예: 기업 홍보" />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-ink/60 mb-2 uppercase">역할</label>
-                    <input value={editingProject.role || ''} onChange={e => setEditingProject({...editingProject, role: e.target.value})} className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 font-medium text-ink" placeholder="예: 편집 100%" />
+                    <label className="block text-xs font-bold text-ink/60 mb-2 uppercase">역할 (Main Role)</label>
+                    <input value={editingProject.role || ''} onChange={e => setEditingProject({...editingProject, role: e.target.value})} className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 font-medium text-ink" placeholder="예: Video Producer" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-ink/60 mb-2 uppercase">제작 범위 (Production Scope)</label>
+                    <input value={editingProject.production_scope || ''} onChange={e => setEditingProject({...editingProject, production_scope: e.target.value})} className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 font-medium text-ink" placeholder="예: 기획, 연출, 편집" />
                   </div>
                 </div>
                 <div>
@@ -1378,26 +1377,23 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
                         const file = e.dataTransfer.files[0];
                         if (file) {
                           try {
-                            const fileExt = file.name.split('.').pop();
-                            const fileName = `${Math.random()}.${fileExt}`;
-                            const filePath = `uploads/${fileName}`;
-
-                            const { error: uploadError } = await supabase.storage
-                              .from('portfolio')
-                              .upload(filePath, file);
-
-                            if (uploadError) throw uploadError;
-
-                            const { data } = supabase.storage
-                              .from('portfolio')
-                              .getPublicUrl(filePath);
-
-                            if (data.publicUrl) {
-                              setEditingProject(prev => ({...prev!, thumbnail: data.publicUrl}));
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            
+                            const res = await fetch('/api/upload', {
+                              method: 'POST',
+                              body: formData
+                            });
+                            
+                            if (!res.ok) throw new Error('업로드 실패');
+                            const data = await res.json();
+                            
+                            if (data.url) {
+                              setEditingProject(prev => ({...prev!, thumbnail: data.url}));
                             }
                           } catch (err) { 
                             console.error(err);
-                            alert('이미지 업로드에 실패했습니다. Supabase Storage 설정을 확인해주세요.');
+                            alert('이미지 업로드에 실패했습니다.');
                           }
                         }
                       }}
@@ -1409,26 +1405,23 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
                           const file = e.target.files[0];
                           if (file) {
                             try {
-                              const fileExt = file.name.split('.').pop();
-                              const fileName = `${Math.random()}.${fileExt}`;
-                              const filePath = `uploads/${fileName}`;
-
-                              const { error: uploadError } = await supabase.storage
-                                .from('portfolio')
-                                .upload(filePath, file);
-
-                              if (uploadError) throw uploadError;
-
-                              const { data } = supabase.storage
-                                .from('portfolio')
-                                .getPublicUrl(filePath);
-
-                              if (data.publicUrl) {
-                                setEditingProject(prev => ({...prev!, thumbnail: data.publicUrl}));
+                              const formData = new FormData();
+                              formData.append('file', file);
+                              
+                              const res = await fetch('/api/upload', {
+                                method: 'POST',
+                                body: formData
+                              });
+                              
+                              if (!res.ok) throw new Error('업로드 실패');
+                              const data = await res.json();
+                              
+                              if (data.url) {
+                                setEditingProject(prev => ({...prev!, thumbnail: data.url}));
                               }
                             } catch (err) { 
                               console.error(err);
-                              alert('이미지 업로드에 실패했습니다. Supabase Storage 설정을 확인해주세요.');
+                              alert('이미지 업로드에 실패했습니다.');
                             }
                           }
                         };
@@ -1792,18 +1785,16 @@ export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
 
   const fetchData = async () => {
-    if (!supabase) return;
-    
     try {
       const [pRes, eRes, prRes] = await Promise.all([
-        supabase.from('projects').select('*').order('order_index', { ascending: true }),
-        supabase.from('experience').select('*').single(),
-        supabase.from('profile').select('*').single()
+        fetch('/api/projects').then(r => r.json()),
+        fetch('/api/experience').then(r => r.json()),
+        fetch('/api/profile').then(r => r.json())
       ]);
       
-      if (pRes.data) setProjects(pRes.data);
-      if (eRes.data) setExperience(eRes.data);
-      if (prRes.data) setProfile(prRes.data);
+      setProjects(pRes);
+      setExperience(eRes);
+      setProfile(prRes);
     } catch (err) {
       console.error('Fetch Data Error:', err);
     }

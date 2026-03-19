@@ -16,6 +16,7 @@ export interface Project {
   problem_goal?: string;
   solution_point?: string;
   tools?: string;
+  production_scope?: string;
 }
 
 export interface Experience {
