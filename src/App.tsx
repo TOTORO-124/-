@@ -921,8 +921,7 @@ const AdminPanel = ({ projects, experience, profile, user, onClose }: {
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (err: any) {
-      console.error(err);
-      alert(`로그인 오류: ${err.message || '알 수 없는 오류가 발생했습니다.'}\n코드: ${err.code || 'N/A'}`);
+      console.error('Login error:', err);
     }
   };
 
@@ -1405,8 +1404,9 @@ const AdminPanel = ({ projects, experience, profile, user, onClose }: {
                             const downloadURL = await getDownloadURL(snapshot.ref);
                             
                             setEditingProject(prev => ({...prev!, thumbnail: downloadURL}));
-                          } catch (err) { 
-                            console.error(err);
+                          } catch (err: any) { 
+                            console.error('Upload error:', err);
+                            alert(`이미지 업로드 실패: ${err.message || '알 수 없는 오류'}\n코드: ${err.code || 'N/A'}`);
                           } finally {
                             setIsSaving(false);
                           }
@@ -1426,8 +1426,9 @@ const AdminPanel = ({ projects, experience, profile, user, onClose }: {
                               const downloadURL = await getDownloadURL(snapshot.ref);
                               
                               setEditingProject(prev => ({...prev!, thumbnail: downloadURL}));
-                            } catch (err) { 
-                              console.error(err);
+                            } catch (err: any) { 
+                              console.error('Upload error:', err);
+                              alert(`이미지 업로드 실패: ${err.message || '알 수 없는 오류'}\n코드: ${err.code || 'N/A'}`);
                             } finally {
                               setIsSaving(false);
                             }
