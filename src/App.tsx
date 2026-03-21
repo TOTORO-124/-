@@ -920,8 +920,9 @@ const AdminPanel = ({ projects, experience, profile, user, onClose }: {
   const handleLogin = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      alert(`로그인 오류: ${err.message || '알 수 없는 오류가 발생했습니다.'}\n코드: ${err.code || 'N/A'}`);
     }
   };
 
