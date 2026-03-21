@@ -1,0 +1,93 @@
+{
+  "entities": {
+    "Project": {
+      "title": "Project",
+      "description": "A portfolio project item",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "type": { "type": "string" },
+        "description": { "type": "string" },
+        "role": { "type": "string" },
+        "link": { "type": "string" },
+        "thumbnail": { "type": "string" },
+        "is_featured": { "type": "boolean" },
+        "is_main": { "type": "boolean" },
+        "is_hidden": { "type": "boolean" },
+        "order_index": { "type": "number" },
+        "category": { "type": "string" },
+        "notes": { "type": "string" },
+        "work_point": { "type": "string" },
+        "problem_goal": { "type": "string" },
+        "solution_point": { "type": "string" },
+        "tools": { "type": "string" },
+        "production_scope": { "type": "string" }
+      },
+      "required": ["title", "type", "description", "role", "link", "thumbnail", "is_featured", "is_main", "is_hidden", "order_index", "category"]
+    },
+    "Experience": {
+      "title": "Experience",
+      "description": "A work experience item",
+      "type": "object",
+      "properties": {
+        "role": { "type": "string" },
+        "period": { "type": "string" },
+        "field": { "type": "string" },
+        "scope": { "type": "string" },
+        "strengths": { "type": "string" },
+        "brands": { "type": "string" }
+      },
+      "required": ["role", "period", "field", "scope", "strengths", "brands"]
+    },
+    "Profile": {
+      "title": "Profile",
+      "description": "Site-wide profile and content settings",
+      "type": "object",
+      "properties": {
+        "hero_title": { "type": "string" },
+        "hero_subtitle": { "type": "string" },
+        "hero_description": { "type": "string" },
+        "hero_label": { "type": "string" },
+        "about_text": { "type": "string" },
+        "featured_title": { "type": "string" },
+        "featured_subtitle": { "type": "string" },
+        "work_title": { "type": "string" },
+        "work_subtitle": { "type": "string" },
+        "contact_title": { "type": "string" },
+        "contact_subtitle": { "type": "string" },
+        "contact_email": { "type": "string" },
+        "contact_kakao": { "type": "string" },
+        "exp_title": { "type": "string" },
+        "exp_label_field": { "type": "string" },
+        "exp_label_scope": { "type": "string" },
+        "exp_label_strengths": { "type": "string" },
+        "exp_label_brands": { "type": "string" },
+        "about_title": { "type": "string" },
+        "about_subtitle": { "type": "string" },
+        "about_strengths_title": { "type": "string" },
+        "site_name": { "type": "string" },
+        "strength1_title": { "type": "string" },
+        "strength1_desc": { "type": "string" },
+        "strength2_title": { "type": "string" },
+        "strength2_desc": { "type": "string" },
+        "strength3_title": { "type": "string" },
+        "strength3_desc": { "type": "string" }
+      },
+      "required": ["hero_title", "hero_subtitle", "hero_description", "hero_label", "about_text", "site_name"]
+    }
+  },
+  "firestore": {
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "Portfolio projects"
+    },
+    "/experience/{experienceId}": {
+      "schema": "Experience",
+      "description": "Work experiences"
+    },
+    "/profile/{profileId}": {
+      "schema": "Profile",
+      "description": "Site profile settings"
+    }
+  }
+}

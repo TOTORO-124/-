@@ -32,6 +32,30 @@ import {
   Target
 } from 'lucide-react';
 import { Project, Experience, Profile } from './types';
+import { 
+  db, 
+  auth, 
+  storage,
+  googleProvider, 
+  signInWithPopup, 
+  onAuthStateChanged, 
+  signOut, 
+  collection, 
+  doc, 
+  onSnapshot, 
+  query, 
+  orderBy,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  OperationType,
+  handleFirestoreError,
+  User
+} from './firebase';
+import { seedData } from './seedData';
 
 // --- Constants ---
 
@@ -871,16 +895,13 @@ const ContactSection = ({ profile }: { profile: Profile | null }) => {
 
 // --- Admin Panel ---
 
-const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: { 
+const AdminPanel = ({ projects, experience, profile, user, onClose }: { 
   projects: Project[], 
   experience: Experience | null,
   profile: Profile | null,
-  onUpdate: () => void,
+  user: User | null,
   onClose: () => void 
 }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [password, setPassword] = useState('');
-  const [token, setToken] = useState('');
   const [activeTab, setActiveTab] = useState<'projects' | 'experience' | 'profile'>('projects');
   const [isSaving, setIsSaving] = useState(false);
   
@@ -898,124 +919,99 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setIsLoggedIn(true);
-        setToken(data.token);
-      } else {
-        alert(data.message || '비밀번호가 틀렸습니다.');
-      }
+      await signInWithPopup(auth, googleProvider);
     } catch (err) {
       console.error(err);
-      alert('로그인 처리 중 오류가 발생했습니다.');
     }
   };
 
+  const isAdmin = user?.email === 'gns12047@gmail.com';
+
   const saveProject = async (p: Partial<Project>) => {
+    if (!isAdmin) return;
     setIsSaving(true);
     try {
-      if (!p) return;
-      
-      const method = p.id ? 'PUT' : 'POST';
-      const url = p.id ? `/api/projects/${p.id}` : '/api/projects';
-      
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...p, token })
-      });
-      
-      if (!res.ok) throw new Error('저장 실패');
-      
-      onUpdate();
+      if (p.id) {
+        const { id, ...rest } = p;
+        await updateDoc(doc(db, 'projects', id), { ...rest });
+      } else {
+        const newDocRef = doc(collection(db, 'projects'));
+        await setDoc(newDocRef, { ...p, createdAt: new Date().toISOString() });
+      }
       setEditingProject(null);
-      alert('저장되었습니다.');
-    } catch (err) {
-      console.error(err);
-      alert('저장에 실패했습니다.');
+    } catch (error) {
+      console.error(error);
     } finally {
       setIsSaving(false);
     }
   };
 
-  const deleteProject = async (id: any) => {
-    if (id === undefined || id === null) {
-      alert('삭제할 프로젝트의 ID를 찾을 수 없습니다.');
-      return;
-    }
-
-    if (!window.confirm('정말 이 프로젝트를 삭제하시겠습니까?')) return;
-    
+  const deleteProject = async (id: string) => {
+    if (!isAdmin) return;
     setIsSaving(true);
     try {
-      const res = await fetch(`/api/projects/${id}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token })
-      });
-      if (!res.ok) throw new Error('삭제 실패');
-      onUpdate();
-      alert('삭제되었습니다.');
-    } catch (err) {
-      console.error(err);
-      alert('삭제에 실패했습니다.');
+      await deleteDoc(doc(db, 'projects', id));
+    } catch (error) {
+      console.error(error);
     } finally {
       setIsSaving(false);
     }
   };
 
   const saveExperience = async () => {
-    if (!editingExp) {
-      alert('데이터가 없습니다.');
-      return;
-    }
+    if (!isAdmin || !editingExp) return;
     setIsSaving(true);
     try {
-      const res = await fetch('/api/experience', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...editingExp, token })
-      });
-      if (!res.ok) throw new Error('저장 실패');
-      onUpdate();
-      alert('경력이 업데이트되었습니다.');
-    } catch (err) {
-      console.error(err);
-      alert('저장에 실패했습니다.');
+      await setDoc(doc(db, 'experience', 'main'), editingExp);
+    } catch (error) {
+      console.error(error);
     } finally {
       setIsSaving(false);
     }
   };
 
   const saveProfile = async () => {
-    if (!editingProfile) {
-      alert('데이터가 없습니다.');
-      return;
-    }
+    if (!isAdmin || !editingProfile) return;
     setIsSaving(true);
     try {
-      const res = await fetch('/api/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...editingProfile, token })
-      });
-      if (!res.ok) throw new Error('저장 실패');
-      onUpdate();
-      alert('프로필이 업데이트되었습니다.');
-    } catch (err) {
-      console.error(err);
-      alert('저장에 실패했습니다.');
+      await setDoc(doc(db, 'profile', 'main'), editingProfile);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const cleanupDuplicates = async () => {
+    if (!isAdmin) return;
+    setIsSaving(true);
+    try {
+      const seededIds = Array.from({ length: 12 }, (_, i) => `seed-project-${i + 1}`);
+      const duplicates = projects.filter(p => !seededIds.includes(p.id));
+      for (const p of duplicates) {
+        await deleteDoc(doc(db, 'projects', p.id));
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleRestoreDefaults = async () => {
+    if (!isAdmin) return;
+    setIsSaving(true);
+    try {
+      await seedData();
+    } catch (error) {
+      console.error(error);
     } finally {
       setIsSaving(false);
     }
   };
 
   const moveProject = async (index: number, direction: 'up' | 'down') => {
+    if (!isAdmin) return;
     const newProjects = [...projects];
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
     
@@ -1026,19 +1022,10 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
     
     setIsSaving(true);
     try {
-      const orders = [
-        { id: p1.id, order_index: targetIndex },
-        { id: p2.id, order_index: index }
-      ];
-      
-      const res = await fetch('/api/projects/reorder', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orders, token })
-      });
-      
-      if (!res.ok) throw new Error('순서 변경 실패');
-      onUpdate();
+      await Promise.all([
+        updateDoc(doc(db, 'projects', p1.id), { order_index: targetIndex }),
+        updateDoc(doc(db, 'projects', p2.id), { order_index: index })
+      ]);
     } catch (error) {
       console.error(error);
     } finally {
@@ -1046,26 +1033,41 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
     }
   };
 
-  if (!isLoggedIn) {
+  if (!user) {
     return (
       <div className="fixed inset-0 z-[100] bg-paper/95 backdrop-blur-xl flex items-center justify-center p-6">
-        <div className="w-full max-w-md glass p-8 rounded-3xl shadow-2xl border-ink/10">
+        <div className="w-full max-w-md glass p-8 rounded-3xl shadow-2xl border-ink/10 text-center">
           <h2 className="text-2xl font-bold mb-2 text-ink">관리자 로그인</h2>
-          <p className="text-sm text-ink/60 mb-6">
-            설정하신 비밀번호를 입력하세요.
+          <p className="text-sm text-ink/60 mb-8">
+            포트폴리오 관리를 위해 구글 계정으로 로그인하세요.
           </p>
-          <input 
-            type="password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-            placeholder="비밀번호"
-            className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 mb-6 focus:outline-none focus:border-ink/30 text-ink font-medium"
-          />
-          <div className="flex gap-4">
-            <button onClick={handleLogin} className="flex-1 py-3 bg-cocoa text-sky font-bold rounded-xl hover:bg-cocoa-hover transition-all shadow-lg shadow-cocoa/10">로그인</button>
-            <button onClick={onClose} className="flex-1 py-3 border border-ink/10 rounded-xl text-ink font-bold hover:bg-ink/5 transition-colors">취소</button>
-          </div>
+          <button 
+            onClick={handleLogin} 
+            className="w-full py-4 bg-cocoa text-sky font-bold rounded-xl hover:bg-cocoa-hover transition-all shadow-lg shadow-cocoa/10 flex items-center justify-center gap-3"
+          >
+            <Settings size={20} /> Google 계정으로 로그인
+          </button>
+          <button onClick={onClose} className="mt-4 w-full py-3 text-ink/40 hover:text-ink transition-colors text-sm">취소</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-paper/95 backdrop-blur-xl flex items-center justify-center p-6">
+        <div className="w-full max-w-md glass p-8 rounded-3xl shadow-2xl border-ink/10 text-center">
+          <h2 className="text-2xl font-bold mb-2 text-ink">권한 없음</h2>
+          <p className="text-sm text-ink/60 mb-8">
+            관리자 계정({user.email})이 아닙니다.
+          </p>
+          <button 
+            onClick={() => signOut(auth)} 
+            className="w-full py-4 bg-ink text-paper font-bold rounded-xl hover:bg-ink/90 transition-all"
+          >
+            다른 계정으로 로그인
+          </button>
+          <button onClick={onClose} className="mt-4 w-full py-3 text-ink/40 hover:text-ink transition-colors text-sm">닫기</button>
         </div>
       </div>
     );
@@ -1079,9 +1081,7 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
           <div className="flex gap-4">
             <button 
               onClick={() => {
-                if (window.confirm('로그아웃 하시겠습니까?')) {
-                  setIsLoggedIn(false);
-                }
+                signOut(auth);
               }} 
               className="p-3 glass rounded-xl text-ink hover:bg-cocoa/10 transition-colors"
               title="로그아웃"
@@ -1111,6 +1111,22 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
           >
             프로필 관리
           </button>
+          {isAdmin && (
+            <div className="flex gap-2">
+              <button 
+                onClick={cleanupDuplicates}
+                className="flex-1 md:flex-none px-6 py-3 rounded-xl font-bold transition-all text-sm md:text-base glass text-red-500 hover:bg-red-500/10"
+              >
+                중복 데이터 정리
+              </button>
+              <button 
+                onClick={handleRestoreDefaults}
+                className="flex-1 md:flex-none px-6 py-3 rounded-xl font-bold transition-all text-sm md:text-base glass text-emerald-500 hover:bg-emerald-500/10"
+              >
+                기본 데이터 복구
+              </button>
+            </div>
+          )}
         </div>
 
         {activeTab === 'projects' && (
@@ -1325,6 +1341,11 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
                           if (id) {
                             try {
                               const res = await fetch(`https://vimeo.com/api/v2/video/${id}.json`);
+                              if (!res.ok) throw new Error('Vimeo API error');
+                              const contentType = res.headers.get("content-type");
+                              if (!contentType || !contentType.includes("application/json")) {
+                                throw new Error('Vimeo API returned non-JSON response');
+                              }
                               const data = await res.json();
                               if (data[0]?.thumbnail_large) {
                                 setEditingProject(prev => ({...prev!, link: url, thumbnail: data[0].thumbnail_large}));
@@ -1377,23 +1398,16 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
                         const file = e.dataTransfer.files[0];
                         if (file) {
                           try {
-                            const formData = new FormData();
-                            formData.append('file', file);
+                            setIsSaving(true);
+                            const storageRef = ref(storage, `thumbnails/${Date.now()}-${file.name}`);
+                            const snapshot = await uploadBytes(storageRef, file);
+                            const downloadURL = await getDownloadURL(snapshot.ref);
                             
-                            const res = await fetch('/api/upload', {
-                              method: 'POST',
-                              body: formData
-                            });
-                            
-                            if (!res.ok) throw new Error('업로드 실패');
-                            const data = await res.json();
-                            
-                            if (data.url) {
-                              setEditingProject(prev => ({...prev!, thumbnail: data.url}));
-                            }
+                            setEditingProject(prev => ({...prev!, thumbnail: downloadURL}));
                           } catch (err) { 
                             console.error(err);
-                            alert('이미지 업로드에 실패했습니다.');
+                          } finally {
+                            setIsSaving(false);
                           }
                         }
                       }}
@@ -1405,23 +1419,16 @@ const AdminPanel = ({ projects, experience, profile, onUpdate, onClose }: {
                           const file = e.target.files[0];
                           if (file) {
                             try {
-                              const formData = new FormData();
-                              formData.append('file', file);
+                              setIsSaving(true);
+                              const storageRef = ref(storage, `thumbnails/${Date.now()}-${file.name}`);
+                              const snapshot = await uploadBytes(storageRef, file);
+                              const downloadURL = await getDownloadURL(snapshot.ref);
                               
-                              const res = await fetch('/api/upload', {
-                                method: 'POST',
-                                body: formData
-                              });
-                              
-                              if (!res.ok) throw new Error('업로드 실패');
-                              const data = await res.json();
-                              
-                              if (data.url) {
-                                setEditingProject(prev => ({...prev!, thumbnail: data.url}));
-                              }
+                              setEditingProject(prev => ({...prev!, thumbnail: downloadURL}));
                             } catch (err) { 
                               console.error(err);
-                              alert('이미지 업로드에 실패했습니다.');
+                            } finally {
+                              setIsSaving(false);
                             }
                           }
                         };
@@ -1783,26 +1790,54 @@ export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
-
-  const fetchData = async () => {
-    try {
-      const [pRes, eRes, prRes] = await Promise.all([
-        fetch('/api/projects').then(r => r.json()),
-        fetch('/api/experience').then(r => r.json()),
-        fetch('/api/profile').then(r => r.json())
-      ]);
-      
-      setProjects(pRes);
-      setExperience(eRes);
-      setProfile(prRes);
-    } catch (err) {
-      console.error('Fetch Data Error:', err);
-    }
-  };
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
 
   useEffect(() => {
-    fetchData();
-    
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setIsAuthReady(true);
+    });
+
+    const unsubscribeProjects = onSnapshot(
+      query(collection(db, 'projects'), orderBy('order_index', 'asc')),
+      (snapshot) => {
+        const projectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project));
+        setProjects(projectsData);
+      },
+      (error) => {
+        handleFirestoreError(error, OperationType.LIST, 'projects');
+      }
+    );
+
+    const unsubscribeExperience = onSnapshot(
+      doc(db, 'experience', 'main'), 
+      (doc) => {
+        if (doc.exists()) {
+          setExperience(doc.data() as Experience);
+        } else {
+          setExperience(DEFAULT_EXPERIENCE as Experience);
+        }
+      },
+      (error) => {
+        handleFirestoreError(error, OperationType.GET, 'experience/main');
+      }
+    );
+
+    const unsubscribeProfile = onSnapshot(
+      doc(db, 'profile', 'main'), 
+      (doc) => {
+        if (doc.exists()) {
+          setProfile(doc.data() as Profile);
+        } else {
+          setProfile(DEFAULT_PROFILE as Profile);
+        }
+      },
+      (error) => {
+        handleFirestoreError(error, OperationType.GET, 'profile/main');
+      }
+    );
+
     // Load theme preference
     const savedTheme = localStorage.getItem('theme');
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -1828,7 +1863,14 @@ export default function App() {
     };
 
     mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+
+    return () => {
+      unsubscribeAuth();
+      unsubscribeProjects();
+      unsubscribeExperience();
+      unsubscribeProfile();
+      mediaQuery.removeEventListener('change', handleChange);
+    };
   }, []);
 
   const toggleTheme = () => {
@@ -1900,7 +1942,7 @@ export default function App() {
             projects={projects} 
             experience={experience} 
             profile={profile}
-            onUpdate={fetchData} 
+            user={user}
             onClose={() => setIsAdminOpen(false)} 
           />
         )}

@@ -1,0 +1,146 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: projects
+    // Document ID: auto-generated or seed-project-{n}
+    // Fields:
+    //   - title: string (required)
+    //   - type: string (required)
+    //   - description: string (required)
+    //   - role: string (required)
+    //   - link: string (required)
+    //   - thumbnail: string (required)
+    //   - is_featured: bool (required)
+    //   - is_main: bool (required)
+    //   - is_hidden: bool (required)
+    //   - order_index: number (required)
+    //   - category: string (required)
+    //   - createdAt: string (optional)
+    //
+    // Collection: experience
+    // Document ID: main
+    // Fields:
+    //   - role: string (required)
+    //   - period: string (required)
+    //   - field: string (required)
+    //   - scope: string (required)
+    //   - strengths: string (required)
+    //   - brands: string (required)
+    //
+    // Collection: profile
+    // Document ID: main
+    // Fields:
+    //   - site_name: string (required)
+    //   - hero_title: string (required)
+    //   - hero_subtitle: string (required)
+    //   - hero_description: string (required)
+    //   - hero_label: string (required)
+    //   - about_text: string (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+             request.auth.token.email == "gns12047@gmail.com" && 
+             request.auth.token.email_verified == true;
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidString(field, maxLen) {
+      return request.resource.data[field] is string && request.resource.data[field].size() <= maxLen;
+    }
+
+    function isValidOptionalString(field, maxLen) {
+      return !(field in request.resource.data) || (request.resource.data[field] is string && request.resource.data[field].size() <= maxLen);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidProject() {
+      let fields = ['title', 'type', 'description', 'role', 'link', 'thumbnail', 'is_featured', 'is_main', 'is_hidden', 'order_index', 'category', 'createdAt', 'notes', 'work_point', 'problem_goal', 'solution_point', 'tools', 'production_scope'];
+      return hasOnlyAllowedFields(fields) &&
+             isValidString('title', 200) &&
+             isValidString('type', 100) &&
+             isValidString('description', 2000) &&
+             isValidString('role', 100) &&
+             isValidString('link', 500) &&
+             isValidString('thumbnail', 500) &&
+             request.resource.data.is_featured is bool &&
+             request.resource.data.is_main is bool &&
+             request.resource.data.is_hidden is bool &&
+             request.resource.data.order_index is number &&
+             isValidString('category', 100) &&
+             isValidOptionalString('createdAt', 100);
+    }
+
+    function isValidExperience() {
+      let fields = ['role', 'period', 'field', 'scope', 'strengths', 'brands'];
+      return hasOnlyAllowedFields(fields) &&
+             isValidString('role', 200) &&
+             isValidString('period', 100) &&
+             isValidString('field', 500) &&
+             isValidString('scope', 1000) &&
+             isValidString('strengths', 1000) &&
+             isValidString('brands', 1000);
+    }
+
+    function isValidProfile() {
+      let fields = ['site_name', 'hero_title', 'hero_subtitle', 'hero_description', 'hero_label', 'about_text', 'featured_title', 'featured_subtitle', 'work_title', 'work_subtitle', 'contact_title', 'contact_subtitle', 'contact_email', 'contact_kakao', 'exp_title', 'exp_label_field', 'exp_label_scope', 'exp_label_strengths', 'exp_label_brands', 'about_title', 'about_subtitle', 'about_strengths_title', 'strength1_title', 'strength1_desc', 'strength2_title', 'strength2_desc', 'strength3_title', 'strength3_desc'];
+      return hasOnlyAllowedFields(fields) &&
+             isValidString('site_name', 100) &&
+             isValidString('hero_title', 200) &&
+             isValidString('hero_subtitle', 500) &&
+             isValidString('hero_description', 2000) &&
+             isValidString('hero_label', 100) &&
+             isValidString('about_text', 5000);
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /projects/{projectId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidProject();
+      allow update: if isAdmin() && isValidProject();
+      allow delete: if isAdmin();
+    }
+
+    match /experience/{experienceId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidExperience();
+      allow update: if isAdmin() && isValidExperience();
+      allow delete: if isAdmin();
+    }
+
+    match /profile/{profileId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidProfile();
+      allow update: if isAdmin() && isValidProfile();
+      allow delete: if isAdmin();
+    }
+
+    // Default deny for everything else
+    match /{path=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
