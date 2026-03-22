@@ -20,7 +20,7 @@ export interface Project {
 }
 
 export interface Experience {
-  id: number;
+  id?: number;
   role: string;
   period: string;
   field: string;
@@ -30,7 +30,7 @@ export interface Experience {
 }
 
 export interface Profile {
-  id: number;
+  id?: number;
   hero_title: string;
   hero_subtitle: string;
   hero_description: string;
@@ -42,16 +42,16 @@ export interface Profile {
   work_subtitle: string;
   contact_title: string;
   contact_subtitle: string;
-  contact_email: string;
-  contact_kakao: string;
-  exp_title: string;
-  exp_label_field: string;
-  exp_label_scope: string;
-  exp_label_strengths: string;
-  exp_label_brands: string;
-  about_title: string;
+  contact_email?: string;
+  contact_kakao?: string;
+  exp_title?: string;
+  exp_label_field?: string;
+  exp_label_scope?: string;
+  exp_label_strengths?: string;
+  exp_label_brands?: string;
+  about_title?: string;
   about_subtitle: string;
-  about_strengths_title: string;
+  about_strengths_title?: string;
   site_name: string;
   admin_password?: string;
   strength1_title?: string;
@@ -60,4 +60,5 @@ export interface Profile {
   strength2_desc?: string;
   strength3_title?: string;
   strength3_desc?: string;
+  email?: string;
 }

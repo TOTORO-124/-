@@ -18,39 +18,47 @@
 }
 
 :root {
-  --paper: #110E0D;
-  --beige: #171311;
-  --ink: #F4EDE6;
-  --muted: #B7A99A;
-  --border: #3D322C;
-  --surface: #211A17;
-  --cocoa: #D2A184;
-  --cocoa-hover: #E0B092;
-  --sky: #110E0D;
-  --sky-hover: #171311;
-}
-
-:root.light {
-  --paper: #F7F4EF;
+  --paper: #F7F2EB;
   --beige: #EFE7DC;
-  --ink: #181715;
-  --muted: #5F5953;
-  --border: #D2C6B8;
-  --surface: #FFFCF8;
-  --cocoa: #7A4C33;
-  --cocoa-hover: #5E3826;
-  --sky: #F7F4EF;
+  --ink: #333333;
+  --muted: #6B5E54;
+  --border: #DED6CC;
+  --surface: #FFFFFF;
+  --cocoa: #A0522D; /* Terra cotta accent */
+  --cocoa-hover: #8B4513;
+  --sky: #F7F2EB;
   --sky-hover: #EFE7DC;
 }
 
+:root.dark,
+html.dark {
+  --paper: #1A1A1A;
+  --beige: #242424;
+  --ink: #F2EDED;
+  --muted: #A3968C;
+  --border: #3D3D3D;
+  --surface: #2D2D2D;
+  --cocoa: #CD5C5C; /* Desaturated terra cotta */
+  --cocoa-hover: #B22222;
+  --sky: #1A1A1A;
+  --sky-hover: #242424;
+}
+
 @layer base {
+  html {
+    @apply scroll-smooth;
+  }
   body {
-    @apply bg-paper text-ink font-sans antialiased transition-colors duration-300;
+    @apply bg-paper text-ink font-sans antialiased transition-colors duration-300 overflow-x-hidden;
   }
 }
 
 .glass {
   @apply bg-white/5 backdrop-blur-xl border border-border shadow-sm;
+}
+
+.card-clean {
+  @apply bg-surface/40 backdrop-blur-md border border-ink/5 rounded-[2.5rem] p-8 transition-all duration-500 hover:border-cocoa/20 hover:bg-surface/60;
 }
 
 .video-container {
