@@ -31,6 +31,7 @@ import ScrollProgress from './components/ScrollProgress';
 import Toast from './components/Toast';
 import CustomCursor from './components/CustomCursor';
 import FloatingContact from './components/FloatingContact';
+import SplashScreen from './components/SplashScreen';
 
 // --- Constants ---
 
@@ -75,6 +76,7 @@ function App() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [toasts, setToasts] = useState<{ id: string; message: string; type: 'success' | 'error' | 'info' }[]>([]);
 
   const addToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
@@ -121,11 +123,17 @@ function App() {
       addToast('프로필 데이터를 불러오는 중 오류가 발생했습니다.', 'error');
     });
 
+    // Minimum loading time for smooth transition
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1200);
+
     return () => {
       unsubscribeAuth();
       unsubscribeProjects();
       unsubscribeExp();
       unsubscribeProfile();
+      clearTimeout(timer);
     };
   }, []);
 
@@ -145,6 +153,10 @@ function App() {
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${isDarkMode ? 'dark bg-paper text-ink' : 'bg-paper text-ink'}`}>
+      <AnimatePresence mode="wait">
+        {isLoading && <SplashScreen key="splash" />}
+      </AnimatePresence>
+
       <CustomCursor />
       <ScrollProgress />
       
