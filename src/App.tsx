@@ -30,6 +30,7 @@ import AdminDashboard from './components/AdminDashboard';
 import ScrollProgress from './components/ScrollProgress';
 import Toast from './components/Toast';
 import CustomCursor from './components/CustomCursor';
+import FloatingContact from './components/FloatingContact';
 
 // --- Constants ---
 
@@ -53,7 +54,8 @@ const DEFAULT_PROFILE: Profile = {
   work_subtitle: '포트폴리오',
   contact_title: 'Contact',
   contact_subtitle: "Let's collaborate.",
-  email: 'gns8365@naver.com'
+  email: 'gns8365@naver.com',
+  contact_kakao: 'https://open.kakao.com/o/sribRuxh'
 };
 
 const DEFAULT_EXPERIENCE: Experience = {
@@ -182,6 +184,8 @@ function App() {
 
       <Footer profile={profile || DEFAULT_PROFILE} />
 
+      <FloatingContact kakaoUrl={profile?.contact_kakao || DEFAULT_PROFILE.contact_kakao} />
+
       {/* Modals & Overlays */}
       <ProjectDetailModal 
         project={selectedProject}
@@ -204,7 +208,7 @@ function App() {
       )}
 
       {/* Toast Notifications */}
-      <div className="fixed bottom-8 right-8 z-[200] flex flex-col gap-4">
+      <div className="fixed bottom-24 right-8 z-[200] flex flex-col gap-4">
         <AnimatePresence>
           {toasts.map(toast => (
             <Toast 

@@ -22,10 +22,12 @@ const Footer: React.FC<FooterProps> = ({ profile }) => {
               Let's<br />collaborate.
             </motion.h2>
             <a 
-              href={`mailto:${profile.email}`}
+              href={profile.contact_kakao || `mailto:${profile.email}`}
+              target={profile.contact_kakao ? "_blank" : undefined}
+              rel={profile.contact_kakao ? "noopener noreferrer" : undefined}
               className="inline-flex items-center gap-4 text-xl md:text-2xl font-black hover:text-cocoa transition-colors group"
             >
-              {profile.email}
+              {profile.contact_kakao ? "KakaoTalk Chat" : profile.email}
               <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
             </a>
           </div>
@@ -34,6 +36,9 @@ const Footer: React.FC<FooterProps> = ({ profile }) => {
             <div className="space-y-4">
               <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted">Social</h4>
               <ul className="space-y-2">
+                {profile.contact_kakao && (
+                  <li><a href={profile.contact_kakao} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm font-bold hover:text-cocoa transition-colors"><ExternalLink size={14} /> KakaoTalk</a></li>
+                )}
                 <li><a href="#" className="flex items-center gap-2 text-sm font-bold hover:text-cocoa transition-colors"><Instagram size={14} /> Instagram</a></li>
                 <li><a href="#" className="flex items-center gap-2 text-sm font-bold hover:text-cocoa transition-colors"><Youtube size={14} /> YouTube</a></li>
               </ul>

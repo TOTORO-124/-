@@ -845,6 +845,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 font-medium text-ink"
                   />
                 </div>
+                <div>
+                  <label className="block text-xs font-bold text-ink/60 mb-2 uppercase">카카오톡 링크 (오픈채팅 등)</label>
+                  <input 
+                    value={editingProfile.contact_kakao || ''} 
+                    onChange={e => setEditingProfile({...editingProfile, contact_kakao: e.target.value})}
+                    className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 font-medium text-ink"
+                    placeholder="https://open.kakao.com/..."
+                  />
+                </div>
               </div>
             </div>
 
