@@ -43,16 +43,16 @@ const DEFAULT_PROFILE: Profile = {
   about_text: '영상 제작자로서 저는 단순한 컷 편집을 넘어, 브랜드의 가치를 시각적으로 극대화하는 작업을 지향합니다. 기획 단계부터 참여하여 최종 결과물의 톤앤매너를 일관되게 유지합니다.',
   strength1_title: '기획 및 구성',
   strength1_desc: '정보의 우선순위를 파악하여 흐름이 자연스러운 영상 설계',
-  strength2_title: '연출 및 편집',
-  strength2_desc: '브랜드 톤을 유지하며 몰입감을 극대화하는 시각적 연출',
+  strength2_title: '브랜드 톤앤매너',
+  strength2_desc: '브랜드 컬러와 아이덴티티를 유지하는 감각적인 편집',
   strength3_title: 'AI 워크플로우',
-  strength3_desc: 'AI 도구를 활용한 효율적인 제작 및 기획의 정확도 향상',
-  featured_title: 'Featured Projects',
-  featured_subtitle: '엄선된 대표작',
-  work_title: 'Work Archive',
-  work_subtitle: '전체 작업 모음',
+  strength3_desc: 'AI 툴을 활용한 제작 효율성 극대화 및 퀄리티 향상',
+  featured_title: 'Featured Works',
+  featured_subtitle: '주요 프로젝트',
+  work_title: 'Works',
+  work_subtitle: '포트폴리오',
   contact_title: 'Contact',
-  contact_subtitle: "Let's create something great.",
+  contact_subtitle: "Let's collaborate.",
   email: 'gns8365@naver.com'
 };
 
@@ -62,7 +62,7 @@ const DEFAULT_EXPERIENCE: Experience = {
   field: '기업 홍보, 교육 콘텐츠, 브랜드 필름',
   scope: '기획, 구성, 연출, 편집, 납품 전 과정',
   strengths: '메시지 구조화, 브랜드 톤앤매너 유지, AI 워크플로우 효율화',
-  brands: '다양한 기업 및 교육 기관과 협업 중'
+  brands: 'AIA생명, 현대글로비스, 닥터지, 삼성셀레나영어 등'
 };
 
 function App() {
@@ -72,7 +72,7 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [toasts, setToasts] = useState<{ id: string; message: string; type: 'success' | 'error' | 'info' }[]>([]);
 
   const addToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
