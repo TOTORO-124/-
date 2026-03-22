@@ -18,6 +18,7 @@ const Hero: React.FC<HeroProps> = ({ profile, mainProject, onProjectClick }) => 
       <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
         <div className="lg:col-span-5 space-y-4">
           <motion.div
+            key={`label-${profile.hero_label}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cocoa/5 border border-cocoa/10 text-cocoa text-[10px] font-black uppercase tracking-[0.2em]"
@@ -27,6 +28,7 @@ const Hero: React.FC<HeroProps> = ({ profile, mainProject, onProjectClick }) => 
           </motion.div>
           
           <motion.div
+            key={`titles-${profile.hero_title}-${profile.hero_subtitle}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -41,6 +43,7 @@ const Hero: React.FC<HeroProps> = ({ profile, mainProject, onProjectClick }) => 
           </motion.div>
 
           <motion.p
+            key={`desc-${profile.hero_description}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}

@@ -38,17 +38,17 @@ import SplashScreen from './components/SplashScreen';
 const DEFAULT_PROFILE: Profile = {
   site_name: 'TEDIO',
   hero_label: 'Video Producer / PD',
-  hero_title: '보는 이의 마음을 움직이는 영상의 힘,',
-  hero_subtitle: '브랜드의 이야기를 감각적인 영상 언어로 풀어냅니다.',
-  hero_description: '단순히 예쁜 영상을 만드는 것을 넘어, 브랜드가 전하고자 하는 핵심 메시지를 가장 효과적인 구조로 설계합니다. 기획의 의도가 최종 결과물까지 선명하게 이어지도록 전 과정을 책임지는 비디오 프로듀서 TEDIO입니다.',
+  hero_title: '기획부터 납품까지,',
+  hero_subtitle: '브랜드의 본질을 영상으로 구현합니다.',
+  hero_description: '단순한 편집을 넘어 메시지의 구조를 설계하고 시청자의 몰입을 연출합니다. 기획의 의도가 최종 결과물까지 선명하게 이어지도록 전 과정을 책임지는 비디오 프로듀서 TEDIO입니다.',
   about_subtitle: '본질에 집중할 때 비로소\n선명해지는 브랜드의 가치.',
-  about_text: '좋은 영상은 화려한 효과보다 탄탄한 기획에서 시작된다고 믿습니다. 저는 브랜드의 정체성을 깊이 이해하고, 이를 시각적으로 가장 매력적인 톤앤매너로 구현하는 데 집중합니다. 기획부터 편집까지, 모든 과정에 제작자의 철학을 담아 완성도를 높입니다.',
+  about_text: '좋은 영상은 화려한 효과보다 탄탄한 기획에서 시작된다고 믿습니다. 저는 브랜드가 전달하고자 하는 핵심 메시지를 파악하고, 이를 시각적으로 가장 매력적인 톤앤매너로 구현하는 데 집중합니다. 기획 단계부터 참여하여 최종 마스터링까지, 일관된 톤앤매너로 브랜드의 신뢰도를 높이는 파트너가 되겠습니다.',
   strength1_title: '전략적 스토리텔링',
-  strength1_desc: '단순 나열이 아닌, 시청자의 몰입을 이끌어내는 논리적인 흐름 설계',
+  strength1_desc: '정보의 우선순위를 파악하여 시청자가 자연스럽게 몰입할 수 있는 영상 구조 설계',
   strength2_title: '감각적인 비주얼 디렉팅',
-  strength2_desc: '브랜드 고유의 색깔을 잃지 않으면서도 트렌디함을 놓치지 않는 영상미',
-  strength3_title: '효율적인 제작 프로세스',
-  strength3_desc: '최신 AI 툴과 체계적인 워크플로우를 결합해 높은 퀄리티와 속도를 동시에 확보',
+  strength2_desc: '브랜드 아이덴티티를 관통하는 컬러와 리듬감 있는 편집으로 완성도 높은 영상미 구현',
+  strength3_title: '효율적인 AI 워크플로우',
+  strength3_desc: '최신 AI 기술을 제작 공정에 도입하여 퀄리티는 높이고 제작 기간은 단축하는 스마트한 작업 방식',
   featured_title: 'Featured Works',
   featured_subtitle: '주요 프로젝트',
   work_title: 'Works',
@@ -77,6 +77,7 @@ function App() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [dataLoaded, setDataLoaded] = useState({ projects: false, exp: false, profile: false });
   const [toasts, setToasts] = useState<{ id: string; message: string; type: 'success' | 'error' | 'info' }[]>([]);
 
   const addToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
@@ -96,9 +97,11 @@ function App() {
     const unsubscribeProjects = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project));
       setProjects(data);
+      setDataLoaded(prev => ({ ...prev, projects: true }));
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'projects');
       addToast('프로젝트 데이터를 불러오는 중 오류가 발생했습니다.', 'error');
+      setDataLoaded(prev => ({ ...prev, projects: true })); // Still mark as loaded to avoid infinite loading
     });
 
     const unsubscribeExp = onSnapshot(doc(db, 'experience', 'main'), (docSnap) => {
@@ -107,9 +110,11 @@ function App() {
       } else {
         setExperience(DEFAULT_EXPERIENCE);
       }
+      setDataLoaded(prev => ({ ...prev, exp: true }));
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'experience/main');
       addToast('경력 데이터를 불러오는 중 오류가 발생했습니다.', 'error');
+      setDataLoaded(prev => ({ ...prev, exp: true }));
     });
 
     const unsubscribeProfile = onSnapshot(doc(db, 'profile', 'main'), (docSnap) => {
@@ -118,24 +123,30 @@ function App() {
       } else {
         setProfile(DEFAULT_PROFILE);
       }
+      setDataLoaded(prev => ({ ...prev, profile: true }));
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'profile/main');
       addToast('프로필 데이터를 불러오는 중 오류가 발생했습니다.', 'error');
+      setDataLoaded(prev => ({ ...prev, profile: true }));
     });
-
-    // Minimum loading time for smooth transition
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1200);
 
     return () => {
       unsubscribeAuth();
       unsubscribeProjects();
       unsubscribeExp();
       unsubscribeProfile();
-      clearTimeout(timer);
     };
   }, []);
+
+  useEffect(() => {
+    if (dataLoaded.projects && dataLoaded.exp && dataLoaded.profile) {
+      // Small delay for smooth transition even if data is instant
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [dataLoaded]);
 
   useEffect(() => {
     if (isDarkMode) {
