@@ -140,10 +140,10 @@ function App() {
 
   useEffect(() => {
     if (dataLoaded.projects && dataLoaded.exp && dataLoaded.profile) {
-      // Small delay for smooth transition even if data is instant
+      // Minimum loading time for smooth transition (matches intro sequence)
       const timer = setTimeout(() => {
         setIsLoading(false);
-      }, 800);
+      }, 2500);
       return () => clearTimeout(timer);
     }
   }, [dataLoaded]);
