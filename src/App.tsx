@@ -93,7 +93,7 @@ function App() {
     const q = query(collection(db, 'projects'), orderBy('order_index', 'asc'));
     const unsubscribeProjects = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project));
-      setProjects(data.filter(p => !p.is_hidden));
+      setProjects(data);
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'projects');
       addToast('프로젝트 데이터를 불러오는 중 오류가 발생했습니다.', 'error');
@@ -139,8 +139,9 @@ function App() {
     }
   }, [isDarkMode]);
 
-  const featuredProjects = projects.filter(p => p.is_featured).slice(0, 3);
-  const mainProject = projects.find(p => p.is_main) || projects[0] || null;
+  const visibleProjects = projects.filter(p => !p.is_hidden);
+  const featuredProjects = visibleProjects.filter(p => p.is_featured).slice(0, 3);
+  const mainProject = visibleProjects.find(p => p.is_main) || visibleProjects[0] || null;
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${isDarkMode ? 'dark bg-paper text-ink' : 'bg-paper text-ink'}`}>
@@ -170,7 +171,7 @@ function App() {
         <HowIWork />
 
         <WorkGrid 
-          projects={projects}
+          projects={visibleProjects}
           profile={profile || DEFAULT_PROFILE}
           onProjectClick={setSelectedProject}
         />
