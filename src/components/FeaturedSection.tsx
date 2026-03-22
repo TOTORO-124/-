@@ -25,7 +25,7 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({ projects, profile, on
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.length > 0 ? projects.map((project, idx) => (
             <motion.div
               key={project.id}
@@ -36,7 +36,7 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({ projects, profile, on
               onClick={() => onProjectClick(project)}
               className="card-clean group cursor-pointer flex flex-col h-full"
             >
-              <div className="relative aspect-video rounded-xl overflow-hidden mb-6 bg-paper shadow-sm group-hover:shadow-md transition-all">
+              <div className="relative aspect-video rounded-xl overflow-hidden mb-3 bg-paper shadow-sm group-hover:shadow-md transition-all">
                 <img 
                   src={project.thumbnail || "https://picsum.photos/seed/project/800/450"} 
                   alt={project.title}

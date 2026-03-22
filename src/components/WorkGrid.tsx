@@ -61,7 +61,7 @@ const WorkGrid: React.FC<WorkGridProps> = ({ projects, profile, onProjectClick }
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence mode="popLayout">
             {displayedProjects.length > 0 ? displayedProjects.map((project, index) => (
               <motion.div
@@ -74,7 +74,7 @@ const WorkGrid: React.FC<WorkGridProps> = ({ projects, profile, onProjectClick }
                 onClick={() => onProjectClick(project)}
                 className="group cursor-pointer"
               >
-                <div className="relative aspect-video rounded-xl overflow-hidden mb-4 bg-beige shadow-sm group-hover:shadow-md transition-all">
+                <div className="relative aspect-video rounded-xl overflow-hidden mb-2 bg-beige shadow-sm group-hover:shadow-md transition-all">
                   <img 
                     src={project.thumbnail || "https://picsum.photos/seed/work/800/450"} 
                     alt={project.title} 

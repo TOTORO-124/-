@@ -11,12 +11,12 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ profile, mainProject, onProjectClick }) => {
   return (
-    <section className="relative min-h-[60vh] flex flex-col justify-center pt-20 pb-12 px-6 md:px-12 overflow-hidden">
+    <section className="relative min-h-[60vh] flex flex-col justify-center pt-16 pb-12 px-6 md:px-12 overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-cocoa/5 -skew-x-12 origin-top-right -z-10" />
       
-      <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-8 items-center">
-        <div className="lg:col-span-7 space-y-6">
+      <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <div className="lg:col-span-5 space-y-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -32,10 +32,10 @@ const Hero: React.FC<HeroProps> = ({ profile, mainProject, onProjectClick }) => 
             transition={{ delay: 0.1 }}
             className="space-y-2"
           >
-            <h1 className="text-[3rem] font-black tracking-tighter leading-[1.1] text-ink break-keep">
+            <h1 className="text-[2.5rem] md:text-[3rem] font-black tracking-tighter leading-[1.1] text-ink break-keep">
               {profile.hero_title}
             </h1>
-            <h2 className="text-3xl font-black tracking-tighter leading-[1.1] text-ink/40 break-keep">
+            <h2 className="text-2xl md:text-3xl font-black tracking-tighter leading-[1.1] text-ink/40 break-keep">
               {profile.hero_subtitle}
             </h2>
           </motion.div>
@@ -44,7 +44,7 @@ const Hero: React.FC<HeroProps> = ({ profile, mainProject, onProjectClick }) => 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-base text-ink/70 max-w-lg font-medium leading-relaxed break-keep"
+            className="text-base text-ink/70 font-medium leading-relaxed break-keep"
           >
             {profile.hero_description}
           </motion.p>
@@ -79,11 +79,11 @@ const Hero: React.FC<HeroProps> = ({ profile, mainProject, onProjectClick }) => 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="lg:col-span-5 relative group"
+            className="lg:col-span-7 relative group"
           >
             <div 
               onClick={() => onProjectClick(mainProject)}
-              className="relative aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer shadow-xl shadow-cocoa/10"
+              className="relative aspect-video rounded-2xl overflow-hidden cursor-pointer shadow-xl shadow-cocoa/10"
             >
               <img 
                 src={mainProject.thumbnail} 

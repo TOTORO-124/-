@@ -38,10 +38,10 @@ export const HowIWork: React.FC = () => {
               transition={{ delay: idx * 0.1 }}
               className="card-clean p-8 flex flex-col items-center text-center group"
             >
-              <div className="w-12 h-12 rounded-full bg-cocoa/5 flex items-center justify-center text-cocoa mb-6 group-hover:bg-cocoa group-hover:text-sky transition-all">
+              <div className="w-12 h-12 rounded-full bg-cocoa/5 flex items-center justify-center text-cocoa mb-4 group-hover:bg-cocoa group-hover:text-sky transition-all">
                 {step.icon}
               </div>
-              <h3 className="text-[1.25rem] font-black tracking-tighter text-ink mb-3">{step.title}</h3>
+              <h3 className="text-[1.25rem] font-black tracking-tighter text-ink mb-2">{step.title}</h3>
               <p className="text-sm text-ink/60 font-medium leading-relaxed break-keep">
                 {step.desc}
               </p>

@@ -32,27 +32,27 @@ const Experience: React.FC<ExperienceProps> = ({ experience }) => {
             </div>
           </motion.div>
 
-          <div className="grid lg:grid-cols-12 gap-12 items-center pt-8">
+          <div className="grid lg:grid-cols-12 gap-8 items-center pt-2">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               className="lg:col-span-7"
             >
-              <div className="grid gap-12">
-                <div className="space-y-3">
+              <div className="grid gap-8">
+                <div className="space-y-2">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-cocoa">Field of Expertise</h4>
                   <p className="text-xl md:text-2xl font-black tracking-tighter text-ink leading-tight break-keep">
                     {experience.field}
                   </p>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-cocoa">Production Scope</h4>
                   <p className="text-xl md:text-2xl font-black tracking-tighter text-ink leading-tight break-keep">
                     {experience.scope}
                   </p>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-cocoa">Key Strengths</h4>
                   <p className="text-xl md:text-2xl font-black tracking-tighter text-ink leading-tight break-keep">
                     {experience.strengths}
