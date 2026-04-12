@@ -61,4 +61,5 @@ export interface Profile {
   strength3_title?: string;
   strength3_desc?: string;
   email?: string;
+  og_image?: string;
 }

@@ -57,7 +57,8 @@ const DEFAULT_PROFILE: Profile = {
   contact_title: 'Contact',
   contact_subtitle: "Let's collaborate.",
   email: 'gns8365@naver.com',
-  contact_kakao: 'https://open.kakao.com/o/sribRuxh'
+  contact_kakao: 'https://open.kakao.com/o/sribRuxh',
+  og_image: 'https://img.youtube.com/vi/hv67efNVXlU/maxresdefault.jpg'
 };
 
 const DEFAULT_EXPERIENCE: Experience = {
