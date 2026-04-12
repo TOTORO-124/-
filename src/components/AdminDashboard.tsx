@@ -672,6 +672,54 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   className="w-full bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 font-medium text-ink"
                 />
               </div>
+              <div>
+                <label className="block text-xs font-bold text-ink/60 mb-2 uppercase">사이트 대표 이미지 (OG Image)</label>
+                <div className="grid gap-4">
+                  <div className="flex gap-2">
+                    <input 
+                      value={editingProfile.og_image || ''} 
+                      onChange={e => setEditingProfile({...editingProfile, og_image: e.target.value})} 
+                      className="flex-1 bg-ink/5 border border-ink/10 rounded-xl px-4 py-3 font-medium text-ink" 
+                      placeholder="이미지 URL을 입력하거나 파일을 업로드하세요."
+                    />
+                    {editingProfile.og_image && (
+                      <div className="w-16 h-12 rounded-lg overflow-hidden border border-ink/10 shrink-0">
+                        <img src={editingProfile.og_image} className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
+                  <div 
+                    className="relative border-2 border-dashed border-ink/10 rounded-2xl p-6 flex flex-col items-center justify-center gap-2 hover:border-ink/30 transition-all cursor-pointer group"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.onchange = async (e: any) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          try {
+                            setIsSaving(true);
+                            const storageRef = ref(storage, `site-assets/${Date.now()}-${file.name}`);
+                            const snapshot = await uploadBytes(storageRef, file);
+                            const downloadURL = await getDownloadURL(snapshot.ref);
+                            setEditingProfile(prev => ({...prev!, og_image: downloadURL}));
+                            onSaveSuccess('대표 이미지가 업로드되었습니다.');
+                          } catch (err: any) { 
+                            console.error('Upload error:', err);
+                            onSaveError(`이미지 업로드 실패: ${err.message}`);
+                          } finally {
+                            setIsSaving(false);
+                          }
+                        }
+                      };
+                      input.click();
+                    }}
+                  >
+                    <Upload size={20} className="text-ink/40 group-hover:text-ink transition-colors" />
+                    <p className="text-xs text-ink/60 group-hover:text-ink font-bold">사이트 대표 이미지 업로드 (카톡 썸네일용)</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-6">
