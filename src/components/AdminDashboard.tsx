@@ -221,9 +221,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   return (
     <div className="fixed inset-0 z-[100] bg-paper overflow-y-auto text-ink">
-      <div className="max-w-5xl mx-auto p-6 md:p-12">
-        <div className="flex items-center justify-between mb-12">
-          <h2 className="text-3xl font-bold">대시보드</h2>
+      <div className="max-w-5xl mx-auto p-4 md:p-12">
+        <div className="flex items-center justify-between mb-8 md:mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold">대시보드</h2>
           <div className="flex gap-4">
             <button 
               onClick={() => {
@@ -238,24 +238,24 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 md:gap-4 mb-8">
+        <div className="flex flex-wrap gap-2 mb-8">
           <button 
             onClick={() => setActiveTab('projects')}
-            className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold transition-all text-sm md:text-base ${activeTab === 'projects' ? 'bg-cocoa text-sky shadow-lg shadow-cocoa/20' : 'glass text-ink/60 hover:text-ink'}`}
+            className={`flex-1 md:flex-none px-4 md:px-6 py-3 rounded-xl font-bold transition-all text-xs md:text-base ${activeTab === 'projects' ? 'bg-cocoa text-sky shadow-lg shadow-cocoa/20' : 'glass text-ink/60 hover:text-ink'}`}
           >
-            프로젝트 관리
+            프로젝트
           </button>
           <button 
             onClick={() => setActiveTab('experience')}
-            className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold transition-all text-sm md:text-base ${activeTab === 'experience' ? 'bg-cocoa text-sky shadow-lg shadow-cocoa/20' : 'glass text-ink/60 hover:text-ink'}`}
+            className={`flex-1 md:flex-none px-4 md:px-6 py-3 rounded-xl font-bold transition-all text-xs md:text-base ${activeTab === 'experience' ? 'bg-cocoa text-sky shadow-lg shadow-cocoa/20' : 'glass text-ink/60 hover:text-ink'}`}
           >
-            경력 관리
+            경력
           </button>
           <button 
             onClick={() => setActiveTab('profile')}
-            className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold transition-all text-sm md:text-base ${activeTab === 'profile' ? 'bg-cocoa text-sky shadow-lg shadow-cocoa/20' : 'glass text-ink/60 hover:text-ink'}`}
+            className={`flex-1 md:flex-none px-4 md:px-6 py-3 rounded-xl font-bold transition-all text-xs md:text-base ${activeTab === 'profile' ? 'bg-cocoa text-sky shadow-lg shadow-cocoa/20' : 'glass text-ink/60 hover:text-ink'}`}
           >
-            프로필 관리
+            프로필
           </button>
           {isAdmin && (
             <div className="flex gap-2">
@@ -346,7 +346,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         )}
 
         {activeTab === 'experience' && editingExp && (
-          <div className="glass p-8 rounded-3xl space-y-8 border-ink/10">
+          <div className="glass p-4 md:p-8 rounded-3xl space-y-8 border-ink/10">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold">경력 정보 설정</h3>
               <button 
@@ -418,14 +418,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
 
-            <button 
-              disabled={isSaving}
-              onClick={saveExperience} 
-              className="w-full py-4 bg-cocoa text-sky font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-cocoa-hover transition-all disabled:opacity-50 shadow-lg shadow-cocoa/10"
-            >
-              {isSaving ? <div className="w-5 h-5 border-2 border-sky/30 border-t-sky rounded-full animate-spin" /> : <Save size={20} />}
-              경력 정보 저장
-            </button>
+            <div className="sticky bottom-0 md:static bg-paper/95 md:bg-transparent p-4 md:p-0 -mx-4 md:mx-0 border-t md:border-0 border-ink/10 z-10">
+              <button 
+                disabled={isSaving}
+                onClick={saveExperience} 
+                className="w-full py-4 bg-cocoa text-sky font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-cocoa-hover transition-all disabled:opacity-50 shadow-lg shadow-cocoa/10"
+              >
+                {isSaving ? <div className="w-5 h-5 border-2 border-sky/30 border-t-sky rounded-full animate-spin" /> : <Save size={20} />}
+                경력 정보 저장
+              </button>
+            </div>
           </div>
         )}
 
@@ -436,16 +438,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[110] bg-paper/90 flex items-center justify-center p-6 backdrop-blur-xl"
+              className="fixed inset-0 z-[110] bg-paper/95 flex items-center justify-center p-0 md:p-6 backdrop-blur-xl"
             >
               <motion.div 
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="w-full max-w-2xl glass p-8 rounded-3xl max-h-[90vh] overflow-y-auto text-ink"
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 50, opacity: 0 }}
+                className="w-full h-full md:h-auto md:max-w-2xl glass p-6 md:p-8 md:rounded-3xl overflow-y-auto text-ink"
               >
-                <h3 className="text-2xl font-bold mb-8">{editingProject.id ? '프로젝트 수정' : '새 프로젝트 등록'}</h3>
-                <div className="grid gap-6">
+                <div className="flex items-center justify-between mb-8 sticky top-0 bg-paper/80 backdrop-blur-md py-2 z-10">
+                  <h3 className="text-xl md:text-2xl font-bold">{editingProject.id ? '프로젝트 수정' : '새 프로젝트 등록'}</h3>
+                  <button onClick={() => setEditingProject(null)} className="p-2 hover:bg-ink/5 rounded-full transition-colors">
+                    <X size={24} />
+                  </button>
+                </div>
+                <div className="grid gap-6 pb-20 md:pb-0">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-xs font-bold text-ink/60 mb-2 uppercase">제목</label>
@@ -635,16 +642,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <label className="text-sm font-bold text-ink">영상 숨기기 (홈페이지에서 숨김)</label>
                     </div>
                   </div>
-                  <div className="flex gap-4 pt-4">
+                  <div className="flex flex-col md:flex-row gap-4 pt-4 sticky bottom-0 md:static bg-paper/95 md:bg-transparent p-4 md:p-0 -mx-6 md:mx-0 border-t md:border-0 border-ink/10 z-20">
                     <button 
                       disabled={isSaving}
                       onClick={() => saveProject(editingProject)} 
-                      className="flex-1 py-4 bg-cocoa text-sky font-bold rounded-xl hover:bg-cocoa-hover transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-cocoa/10"
+                      className="flex-[2] py-4 bg-cocoa text-sky font-bold rounded-xl hover:bg-cocoa-hover transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-cocoa/10 order-1 md:order-2"
                     >
                       {isSaving ? <div className="w-5 h-5 border-2 border-sky/30 border-t-sky rounded-full animate-spin" /> : <Save size={20} />}
                       프로젝트 저장
                     </button>
-                    <button onClick={() => setEditingProject(null)} className="flex-1 py-4 glass rounded-xl text-ink">취소</button>
+                    <button 
+                      onClick={() => setEditingProject(null)} 
+                      className="flex-1 py-4 glass rounded-xl text-ink font-bold order-2 md:order-1"
+                    >
+                      취소
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -653,7 +665,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </AnimatePresence>
 
         {activeTab === 'profile' && editingProfile && (
-          <div className="glass p-8 rounded-3xl space-y-8 border-ink/10">
+          <div className="glass p-4 md:p-8 rounded-3xl space-y-8 border-ink/10">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold">전체 사이트 문구 설정</h3>
               <button 
@@ -906,14 +918,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
 
-            <button 
-              disabled={isSaving}
-              onClick={saveProfile} 
-              className="w-full py-4 bg-cocoa text-sky font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-cocoa-hover transition-all disabled:opacity-50 shadow-lg shadow-cocoa/10"
-            >
-              {isSaving ? <div className="w-5 h-5 border-2 border-sky/30 border-t-sky rounded-full animate-spin" /> : <Save size={20} />}
-              프로필 정보 저장
-            </button>
+            <div className="sticky bottom-0 md:static bg-paper/95 md:bg-transparent p-4 md:p-0 -mx-4 md:mx-0 border-t md:border-0 border-ink/10 z-10">
+              <button 
+                disabled={isSaving}
+                onClick={saveProfile} 
+                className="w-full py-4 bg-cocoa text-sky font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-cocoa-hover transition-all disabled:opacity-50 shadow-lg shadow-cocoa/10"
+              >
+                {isSaving ? <div className="w-5 h-5 border-2 border-sky/30 border-t-sky rounded-full animate-spin" /> : <Save size={20} />}
+                프로필 정보 저장
+              </button>
+            </div>
           </div>
         )}
       </div>
