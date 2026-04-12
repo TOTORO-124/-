@@ -20,17 +20,18 @@ const Navbar: React.FC<NavbarProps> = ({ siteName, isDark, toggleTheme, onAdminC
   }, []);
 
   const navLinks = [
-    { name: 'Works', href: '#works' },
-    { name: 'About', href: '#about' },
-    { name: 'Experience', href: '#experience' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Works', href: '/#works' },
+    { name: 'About', href: '/#about' },
+    { name: 'Experience', href: '/#experience' },
+    { name: 'Proposal', href: '/proposal' },
+    { name: 'Contact', href: '/#contact' },
   ];
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'py-2 bg-paper/80 backdrop-blur-xl border-b border-ink/5' : 'py-4 bg-transparent'}`}>
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
         <motion.a 
-          href="#"
+          href="/"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="text-lg md:text-xl font-black tracking-tighter text-ink flex items-center gap-2"

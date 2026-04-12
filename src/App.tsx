@@ -32,6 +32,7 @@ import Toast from './components/Toast';
 import CustomCursor from './components/CustomCursor';
 import FloatingContact from './components/FloatingContact';
 import SplashScreen from './components/SplashScreen';
+import Proposal from './components/Proposal';
 
 // --- Constants ---
 
@@ -79,6 +80,15 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [dataLoaded, setDataLoaded] = useState({ projects: false, exp: false, profile: false });
   const [toasts, setToasts] = useState<{ id: string; message: string; type: 'success' | 'error' | 'info' }[]>([]);
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
 
   const addToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
     const id = Date.now().toString();
@@ -161,6 +171,25 @@ function App() {
   const visibleProjects = projects.filter(p => !p.is_hidden);
   const featuredProjects = visibleProjects.filter(p => p.is_featured).slice(0, 3);
   const mainProject = visibleProjects.find(p => p.is_main) || visibleProjects[0] || null;
+
+  if (currentPath === '/proposal') {
+    return (
+      <div className={`min-h-screen transition-colors duration-500 ${isDarkMode ? 'dark bg-paper text-ink' : 'bg-paper text-ink'}`}>
+        <AnimatePresence mode="wait">
+          {isLoading && <SplashScreen key="splash" />}
+        </AnimatePresence>
+        <CustomCursor />
+        <Navbar 
+          siteName={profile?.site_name || 'TEDIO'} 
+          isDark={isDarkMode}
+          toggleTheme={() => setIsDarkMode(!isDarkMode)}
+          onAdminClick={() => setShowAdmin(true)}
+        />
+        <Proposal />
+        <Footer profile={profile || DEFAULT_PROFILE} />
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${isDarkMode ? 'dark bg-paper text-ink' : 'bg-paper text-ink'}`}>
