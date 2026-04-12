@@ -49,11 +49,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       await signInWithPopup(auth, googleProvider);
     } catch (err: any) {
       console.error('Login error:', err);
-      onSaveError('로그인에 실패했습니다.');
+      onSaveError(`로그인 실패: ${err.message || '알 수 없는 오류'}`);
     }
   };
 
-  const isAdmin = user?.email === 'gns12047@gmail.com';
+  const adminEmails = ['gns12047@gmail.com', 'gns8365@naver.com'];
+  const isAdmin = user?.email && adminEmails.includes(user.email);
 
   const saveProject = async (p: Partial<Project>) => {
     if (!isAdmin) return;
