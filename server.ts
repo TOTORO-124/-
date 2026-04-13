@@ -5,10 +5,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
-
-// Import the Firebase configuration
-const firebaseConfigPath = path.join(process.cwd(), 'firebase-applet-config.json');
-const firebaseConfig = JSON.parse(fs.readFileSync(firebaseConfigPath, 'utf8'));
+import firebaseConfig from './firebase-applet-config.json' with { type: "json" };
 
 // Initialize Firebase SDK for server-side
 const firebaseApp = initializeApp(firebaseConfig);
@@ -23,7 +20,7 @@ const PORT = 3000;
 app.use(express.json());
 
 // Serve public folder
-app.use(express.static(path.join(process.cwd(), "public")));
+app.use(express.static(path.join(__dirname, "public")));
 
 async function getOgImage() {
   try {
@@ -67,7 +64,7 @@ async function setupVite() {
 
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), "dist");
+    const distPath = path.join(__dirname, "dist");
     if (fs.existsSync(distPath)) {
       app.use(express.static(distPath, { index: false }));
       app.get("*", async (req, res) => {
